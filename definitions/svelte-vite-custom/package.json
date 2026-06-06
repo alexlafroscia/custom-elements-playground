@@ -1,13 +1,12 @@
 {
-  "name": "svelte-vite-custom",
+  "name": "@cem-playground/svelte-vite-custom",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^7.1.2",

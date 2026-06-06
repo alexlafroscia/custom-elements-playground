@@ -1,0 +1,22 @@
+[tasks.build]
+description = "Build the library"
+run = "pnpm exec vite build"
+sources = ["src", "svelte.config.js", "vite.config.ts"]
+outputs = ["dist"]
+
+[tasks.check]
+description = "Run all checks"
+run = [
+  { task = "check:app" },
+  { task = "check:node" }
+]
+
+[tasks."check:app"]
+description = "Type-check the source code"
+run = "pnpm exec svelte-check --tsconfig ./tsconfig.app.json"
+hide = true
+
+[tasks."check:node"]
+description = "Type-check configuration files"
+run = "pnpm exec tsc -p tsconfig.node.json"
+hide = true
