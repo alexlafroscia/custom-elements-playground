@@ -1,0 +1,17 @@
+[tasks.build]
+description = "Build library and types"
+run = "pnpm exec tsc -p tsconfig.src.json"
+sources = ["src/**/*.ts", "tsconfig.src.json"]
+outputs = ["dist"]
+
+[tasks.test]
+description = "Run the unit tests"
+run = "node --experimental-strip-types --test './test/**/*.test.ts'"
+depends = ["typecheck:tests"]
+
+[tasks."typecheck:tests"]
+description = "Type-check the tests"
+run = "pnpm exec tsc -p tsconfig.test.json --noEmit"
+sources = ["test/**/*"]
+outputs = ["dist/tsconfig.test.tsbuildinfo"]
+depends = ["build"]

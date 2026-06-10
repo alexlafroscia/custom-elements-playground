@@ -13,13 +13,6 @@
   }
 
   let { name }: Props = $props();
-
-  /**
-   * Return a value from inside of the component
-   */
-  export function getName(): string {
-    return name;
-  }
 </script>
 
 <p>Hello, {name}</p>

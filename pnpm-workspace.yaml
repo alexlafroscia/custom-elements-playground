@@ -1,3 +1,6 @@
 packages:
   - "definitions/*"
   - "hosts/*"
+  - "tools/*"
+allowBuilds:
+  rs-module-lexer: true

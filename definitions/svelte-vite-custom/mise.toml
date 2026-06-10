@@ -1,8 +1,22 @@
 [tasks.build]
+description = "Build all output"
+run = [
+  { task = "build:src"},
+  { task = "build:cem"}
+]
+
+[tasks."build:src"]
 description = "Build the library"
 run = "pnpm exec vite build"
 sources = ["src", "svelte.config.js", "vite.config.ts"]
 outputs = ["dist"]
+
+[tasks."build:cem"]
+description = "Build the Custom Elements Manifest"
+run = "pnpm exec cem analyze"
+sources = ["src", "custom-elements-manifest.config.js"]
+outputs = ["custom-elements.json"]
+depends = ["//tools/cem-plugin-svelte:build"]
 
 [tasks.check]
 description = "Run all checks"

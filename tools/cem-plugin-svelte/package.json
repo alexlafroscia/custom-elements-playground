@@ -1,0 +1,27 @@
+{
+  "name": "@ce-ts-playground/cem-plugin-svelte",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "dependencies": {
+    "@cem-analyzer-dep/typescript": "npm:typescript@5.4.5"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^24.13.0",
+    "custom-elements-manifest": "^2.1.0",
+    "svelte": "^5.56.2",
+    "svelte2tsx": "^0.7.56",
+    "typescript": "~6.0.2"
+  }
+}

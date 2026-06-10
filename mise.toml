@@ -1,3 +1,12 @@
+experimental_monorepo_root = true
+
+[monorepo]
+config_roots = [
+  "definitions/*",
+  "hosts/*",
+  "tools/*"
+]
+
 [tools]
 node = "lts"
 pnpm = "11.5.2"
