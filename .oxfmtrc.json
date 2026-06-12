@@ -1,5 +1,8 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "ignorePatterns": [],
-  "sortImports": true
+  "sortImports": true,
+
+  // This seems like it might have behaved differently locally vs CI
+  "sortPackageJson": false
 }
