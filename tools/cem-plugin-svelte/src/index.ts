@@ -1,2 +1,1 @@
-export * from "./plugin.js";
-export * from "./override-module-creation.js";
+export * from "./create-svelte-plugin.js";

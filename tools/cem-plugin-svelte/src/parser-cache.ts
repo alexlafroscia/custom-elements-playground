@@ -7,25 +7,23 @@ export type ParserCacheEntry = {
   tsx: SvelteCompiledToTsx;
 };
 
-const PARSER_CACHE = new Map<string, ParserCacheEntry>();
+export class ParserCache {
+  private cache = new Map<string, ParserCacheEntry>();
 
-export function storeCompilerResult(path: string, result: ParserCacheEntry) {
-  const normalizedPath = normalize(path);
+  store(path: string, result: ParserCacheEntry) {
+    const normalizedPath = normalize(path);
 
-  PARSER_CACHE.set(normalizedPath, result);
-}
-
-export function getCompilerResult(path: string) {
-  const normalizedPath = normalize(path);
-  const value = PARSER_CACHE.get(normalizedPath);
-
-  if (!value) {
-    throw new Error(`\`${path}\` is not in the cache`);
+    this.cache.set(normalizedPath, result);
   }
 
-  return value;
-}
+  get(path: string) {
+    const normalizedPath = normalize(path);
+    const value = this.cache.get(normalizedPath);
 
-export function reset() {
-  PARSER_CACHE.clear();
+    if (!value) {
+      throw new Error(`\`${path}\` is not in the cache`);
+    }
+
+    return value;
+  }
 }

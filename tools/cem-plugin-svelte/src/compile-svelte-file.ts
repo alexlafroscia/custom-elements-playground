@@ -1,7 +1,7 @@
 import { type CompileOptions, parse } from "svelte/compiler";
 import { svelte2tsx } from "svelte2tsx";
 
-import { storeCompilerResult } from "./parser-cache.js";
+import type { SveltePluginState } from "./state.js";
 
 export type SupportedCompilerOptions = Omit<
   CompileOptions,
@@ -10,20 +10,18 @@ export type SupportedCompilerOptions = Omit<
 
 interface CompileSvelteFileOptions {
   glob: string;
-  cwd: string;
-  compilerOptions?: SupportedCompilerOptions;
 }
 
 export function compileSvelteFile(
   source: string,
+  state: SveltePluginState,
   options: CompileSvelteFileOptions,
 ): string {
-  const { glob, cwd, compilerOptions = {} } = options;
+  const { glob } = options;
 
   const svelteCompilerOutput = parse(source, {
     filename: glob,
     modern: true,
-    // ...compilerOptions,
   });
 
   const tsxCompilerOutput = svelte2tsx(source, {
@@ -32,7 +30,7 @@ export function compileSvelteFile(
   });
 
   // Cache compiler result for the plugin to access
-  storeCompilerResult(glob, {
+  state.parserCache.store(glob, {
     svelte: svelteCompilerOutput,
     tsx: tsxCompilerOutput,
   });

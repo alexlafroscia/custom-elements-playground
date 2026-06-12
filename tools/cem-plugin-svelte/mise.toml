@@ -7,7 +7,7 @@ outputs = ["dist"]
 [tasks.test]
 description = "Run the unit tests"
 run = "node --experimental-strip-types --test './test/**/*.test.ts'"
-depends = ["typecheck:tests"]
+depends = ["build", "typecheck:tests"]
 
 [tasks."typecheck:tests"]
 description = "Type-check the tests"

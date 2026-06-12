@@ -3,9 +3,7 @@ import * as fs from "node:fs/promises";
 // @ts-expect-error
 import { create, ts } from "@custom-elements-manifest/analyzer";
 
-import { overrideModuleCreation } from "../dist/override-module-creation.js";
-import { svelte } from "../dist/plugin.js";
-import { reset } from "../dist/parser-cache.js";
+import { createSveltePlugin } from "../dist/create-svelte-plugin.js";
 
 export async function generateManifest(path: string) {
   const fixtureContents = await fs.readdir(path, {
@@ -15,21 +13,14 @@ export async function generateManifest(path: string) {
     .filter((entry) => entry.name.endsWith("svelte"))
     .map((entry) => entry.name);
 
-  const moduleCreator = overrideModuleCreation({
+  const { plugin, overrideModuleCreation } = createSveltePlugin({
     cwd: path,
     compilerOptions: {
       customElement: true,
     },
   });
-  const modules = moduleCreator({
-    ts,
-    globs: globs,
-  });
 
-  const result = create({ modules, plugins: [svelte()] });
+  const modules = overrideModuleCreation({ ts, globs });
 
-  // Make sure that the parser cache does not bleed between tests
-  reset();
-
-  return result;
+  return create({ modules, plugins: [plugin] });
 }

@@ -8,7 +8,7 @@ config_roots = [
 ]
 
 [tools]
-node = "lts"
+node = "24.14.0"
 pnpm = "11.5.2"
 
 [deps.pnpm]

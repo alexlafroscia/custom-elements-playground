@@ -1,60 +1,55 @@
-import { parse, resolve } from "node:path";
+import { normalize, parse, resolve } from "node:path";
 import * as fs from "node:fs";
 
 import type { Config } from "@custom-elements-manifest/analyzer";
 
-import type ts from "@cem-analyzer-dep/typescript";
-import {
-  type SupportedCompilerOptions,
-  compileSvelteFile,
-} from "./compile-svelte-file.js";
+import { compileSvelteFile } from "./compile-svelte-file.js";
+import type { SveltePluginState } from "./state.js";
 
-type OverrideModuleCreation = Exclude<
+export type OverrideModuleCreation = Exclude<
   Config["overrideModuleCreation"],
   undefined
 >;
 
-/**
- * 1:1 copy of the CEM analyzer default module parser
- */
-function defaultParse(compiler: typeof ts, glob: string, source: string) {
-  return compiler.createSourceFile(
-    glob,
-    source,
-    compiler.ScriptTarget.ES2015,
-    true,
-  );
-}
-
-interface OverrideModuleCreationOptions {
-  cwd?: string;
-  compilerOptions?: SupportedCompilerOptions;
-}
-
-/**
- * Creates an `overrideModuleCreation` function for the CEM analyzer that
- * handles parsing `.svelte` files into the format needed by the plugin
- */
-export function overrideModuleCreation({
-  cwd = process.cwd(),
-  compilerOptions = {},
-}: OverrideModuleCreationOptions = {}): OverrideModuleCreation {
+export function createOverrideModuleCreation(
+  state: SveltePluginState,
+): OverrideModuleCreation {
   return ({ ts, globs }) => {
-    return globs.map((glob) => {
-      const fullPath = resolve(cwd, glob);
-      const parsedPath = parse(glob);
+    // Map absolute .svelte.tsx virtual path → tsx content for the typed program
+    const virtualFiles = new Map<string, string>();
 
+    const sourceFiles = globs.map((glob) => {
+      const fullPath = resolve(state.cwd, glob);
       let source = fs.readFileSync(fullPath).toString();
 
-      if (parsedPath.ext.endsWith("svelte")) {
-        source = compileSvelteFile(source, {
-          glob,
-          cwd,
-          compilerOptions,
-        });
+      if (parse(glob).ext.endsWith("svelte")) {
+        source = compileSvelteFile(source, state, { glob });
+        // Use .svelte.tsx so TypeScript recognises it as a TSX file
+        virtualFiles.set(normalize(fullPath + ".tsx"), source);
       }
 
-      return defaultParse(ts, glob, source);
+      // Return with the original relative path so CEM can match it back to the file
+      return ts.createSourceFile(glob, source, ts.ScriptTarget.ES2015, true);
     });
+
+    // Build a separate typed program so we can resolve types across files
+    const host = ts.createCompilerHost({});
+    const realGetSourceFile = host.getSourceFile.bind(host);
+    host.getSourceFile = (filename, langVersion) => {
+      const tsxCode = virtualFiles.get(normalize(filename));
+      if (tsxCode)
+        return ts.createSourceFile(filename, tsxCode, langVersion, true);
+      return realGetSourceFile(filename, langVersion);
+    };
+
+    const rootNames = globs
+      .filter((g) => parse(g).ext.endsWith("svelte"))
+      .map((g) => resolve(state.cwd, g) + ".tsx");
+
+    const program = ts.createProgram(rootNames, { strict: false }, host);
+    state.program = program;
+    state.checker = program.getTypeChecker();
+
+    return sourceFiles;
   };
 }
