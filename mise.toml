@@ -1,11 +1,7 @@
 experimental_monorepo_root = true
 
 [monorepo]
-config_roots = [
-  "definitions/*",
-  "hosts/*",
-  "tools/*"
-]
+config_roots = ["definitions/*", "hosts/*", "tools/*"]
 
 [tools]
 node = "24.14.0"
@@ -13,3 +9,26 @@ pnpm = "11.5.2"
 
 [deps.pnpm]
 auto = true
+
+[deps.husky]
+auto = true
+depends = ["pnpm"]
+run = "pnpm exec husky init"
+outputs = [".husky/_"]
+
+[tasks.format]
+description = "Run formatter on all files"
+run = "pnpm exec oxfmt"
+
+[tasks."format:check"]
+description = "Run formatter on all files"
+run = "pnpm exec oxfmt --check"
+
+[tasks.test]
+description = "Check formatting on all files"
+run = [{ task = "format:check" }]
+
+[tasks."husky:pre-commit"]
+description = "Called by `husky` on pre-commit"
+run = "pnpm exec lint-staged"
+hide = true

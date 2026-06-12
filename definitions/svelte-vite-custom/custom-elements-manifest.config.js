@@ -1,7 +1,4 @@
-import {
-  svelte,
-  overrideModuleCreation,
-} from "@ce-ts-playground/cem-plugin-svelte";
+import { svelte, overrideModuleCreation } from "@ce-ts-playground/cem-plugin-svelte";
 
 import svelteConfig from "./svelte.config.js";
 

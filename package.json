@@ -1,9 +1,14 @@
 {
   "name": "cem-playground-root",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
+  "license": "ISC",
   "author": "",
-  "license": "ISC"
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "oxfmt": "^0.54.0"
+  }
 }

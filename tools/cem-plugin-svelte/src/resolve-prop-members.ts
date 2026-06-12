@@ -48,9 +48,13 @@ export function resolvePropMembers(
   return properties.map((symbol) => {
     const propType = checker.getTypeOfSymbol(symbol);
     const docParts = symbol.getDocumentationComment(checker);
-    const description = docParts.length > 0
-      ? docParts.map((c) => c.text).join("").trim()
-      : undefined;
+    const description =
+      docParts.length > 0
+        ? docParts
+            .map((c) => c.text)
+            .join("")
+            .trim()
+        : undefined;
 
     return {
       name: symbol.name,

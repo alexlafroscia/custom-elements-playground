@@ -1,5 +1,12 @@
+import type {
+  CallExpression,
+  Directive,
+  Identifier,
+  ModuleDeclaration,
+  Statement,
+  VariableDeclaration,
+} from "estree";
 import type { AST } from "svelte/compiler";
-import type { CallExpression, Directive, Identifier, ModuleDeclaration, Statement, VariableDeclaration } from "estree";
 
 // TypeScript AST extensions not in @types/estree — produced by @sveltejs/acorn-typescript
 export interface TSInterfaceDeclaration {
@@ -33,7 +40,8 @@ function getInterfaceName(decl: VariableDeclaration): string | null {
     if (declarator.init?.type !== "CallExpression") continue;
     if (!isPropsCall(declarator.init as CallExpression)) continue;
 
-    const typeAnnotation = (declarator.id as unknown as { typeAnnotation?: TSTypeAnnotation }).typeAnnotation;
+    const typeAnnotation = (declarator.id as unknown as { typeAnnotation?: TSTypeAnnotation })
+      .typeAnnotation;
     const typeRef = typeAnnotation?.typeAnnotation;
     if (typeRef?.type === "TSTypeReference" && typeRef.typeName) {
       return typeRef.typeName.name;
@@ -47,9 +55,7 @@ function getInterfaceName(decl: VariableDeclaration): string | null {
  * reading the type annotation on its result, then resolving that name to its `TSInterfaceDeclaration`.
  * Returns `null` if no `$props()` call exists or if it has no type annotation.
  */
-export function findPropsInterface(
-  root: AST.Root,
-): TSInterfaceDeclaration | null {
+export function findPropsInterface(root: AST.Root): TSInterfaceDeclaration | null {
   const body = root.instance?.content.body;
   if (!body) return null;
 

@@ -1,9 +1,8 @@
 {
   "name": "@cem-playground/svelte-vite-custom",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "customElements": "custom-elements.json",
   "exports": {
     ".": {
       "import": "./dist/index.js"
@@ -19,5 +18,6 @@
     "svelte-check": "^4.4.8",
     "typescript": "~6.0.2",
     "vite": "^8.0.12"
-  }
+  },
+  "customElements": "custom-elements.json"
 }

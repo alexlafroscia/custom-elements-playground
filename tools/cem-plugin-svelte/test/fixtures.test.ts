@@ -1,7 +1,7 @@
-import { test } from "node:test";
 import * as assert from "node:assert";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import { test } from "node:test";
 import * as url from "node:url";
 
 import { generateManifest } from "./test-helpers.ts";
@@ -16,12 +16,9 @@ for (const fixture of fixtures) {
     const root = path.resolve(fixtureDirectory, fixture.name);
     const generatedManifest = await generateManifest(root);
 
-    const expected = await fs.readFile(
-      path.resolve(root, "custom-elements.json"),
-      {
-        encoding: "utf-8",
-      },
-    );
+    const expected = await fs.readFile(path.resolve(root, "custom-elements.json"), {
+      encoding: "utf-8",
+    });
 
     assert.deepStrictEqual(generatedManifest, JSON.parse(expected));
   });

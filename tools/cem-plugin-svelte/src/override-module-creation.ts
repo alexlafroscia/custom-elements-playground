@@ -1,19 +1,14 @@
-import { normalize, parse, resolve } from "node:path";
 import * as fs from "node:fs";
+import { normalize, parse, resolve } from "node:path";
 
 import type { Config } from "@custom-elements-manifest/analyzer";
 
 import { compileSvelteFile } from "./compile-svelte-file.js";
 import type { SveltePluginState } from "./state.js";
 
-export type OverrideModuleCreation = Exclude<
-  Config["overrideModuleCreation"],
-  undefined
->;
+export type OverrideModuleCreation = Exclude<Config["overrideModuleCreation"], undefined>;
 
-export function createOverrideModuleCreation(
-  state: SveltePluginState,
-): OverrideModuleCreation {
+export function createOverrideModuleCreation(state: SveltePluginState): OverrideModuleCreation {
   return ({ ts, globs }) => {
     // Map absolute .svelte.tsx virtual path → tsx content for the typed program
     const virtualFiles = new Map<string, string>();
@@ -37,8 +32,7 @@ export function createOverrideModuleCreation(
     const realGetSourceFile = host.getSourceFile.bind(host);
     host.getSourceFile = (filename, langVersion) => {
       const tsxCode = virtualFiles.get(normalize(filename));
-      if (tsxCode)
-        return ts.createSourceFile(filename, tsxCode, langVersion, true);
+      if (tsxCode) return ts.createSourceFile(filename, tsxCode, langVersion, true);
       return realGetSourceFile(filename, langVersion);
     };
 

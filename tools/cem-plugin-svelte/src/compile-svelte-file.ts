@@ -3,10 +3,7 @@ import { svelte2tsx } from "svelte2tsx";
 
 import type { SveltePluginState } from "./state.js";
 
-export type SupportedCompilerOptions = Omit<
-  CompileOptions,
-  "filename" | "format" | "generate"
->;
+export type SupportedCompilerOptions = Omit<CompileOptions, "filename" | "format" | "generate">;
 
 interface CompileSvelteFileOptions {
   glob: string;

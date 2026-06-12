@@ -1,8 +1,8 @@
 import { resolve } from "node:path";
 
+import type tsModule from "@cem-analyzer-dep/typescript";
 import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
-import type tsModule from "@cem-analyzer-dep/typescript";
 
 import { isSvelteFileNode } from "./is-svelte-file.js";
 import { resolvePropMembers } from "./resolve-prop-members.js";
@@ -37,17 +37,13 @@ export function createPlugin(state: SveltePluginState): Plugin {
           kind: "field",
           name: m.name,
           type: m.type,
-          ...(m.description !== undefined
-            ? { description: m.description }
-            : {}),
+          ...(m.description !== undefined ? { description: m.description } : {}),
           attribute: m.name,
         })),
         attributes: members.map((m) => ({
           name: m.name,
           type: m.type,
-          ...(m.description !== undefined
-            ? { description: m.description }
-            : {}),
+          ...(m.description !== undefined ? { description: m.description } : {}),
           fieldName: m.name,
         })),
       };

@@ -1,4 +1,5 @@
 import { normalize } from "node:path";
+
 import type { AST } from "svelte/compiler";
 import type { SvelteCompiledToTsx } from "svelte2tsx";
 

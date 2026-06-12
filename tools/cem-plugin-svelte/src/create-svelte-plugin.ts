@@ -1,12 +1,12 @@
 import type { Plugin } from "@custom-elements-manifest/analyzer";
 
 import type { SupportedCompilerOptions } from "./compile-svelte-file.js";
-import { ParserCache } from "./parser-cache.js";
-import { createPlugin } from "./plugin.js";
 import {
   type OverrideModuleCreation,
   createOverrideModuleCreation,
 } from "./override-module-creation.js";
+import { ParserCache } from "./parser-cache.js";
+import { createPlugin } from "./plugin.js";
 import type { SveltePluginState } from "./state.js";
 
 export interface CreateSveltePluginOptions {

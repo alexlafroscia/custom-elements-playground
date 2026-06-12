@@ -1,9 +1,6 @@
 [tasks.build]
 description = "Build all output"
-run = [
-  { task = "build:src"},
-  { task = "build:cem"}
-]
+run = [{ task = "build:src" }, { task = "build:cem" }]
 
 [tasks."build:src"]
 description = "Build the library"
@@ -20,10 +17,7 @@ depends = ["//tools/cem-plugin-svelte:build"]
 
 [tasks.check]
 description = "Run all checks"
-run = [
-  { task = "check:app" },
-  { task = "check:node" }
-]
+run = [{ task = "check:app" }, { task = "check:node" }]
 
 [tasks."check:app"]
 description = "Type-check the source code"
