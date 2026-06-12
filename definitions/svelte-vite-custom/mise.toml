@@ -28,3 +28,7 @@ hide = true
 description = "Type-check configuration files"
 run = "pnpm exec tsc -p tsconfig.node.json"
 hide = true
+
+[tasks.test]
+description = "Run all tests"
+run = [{ task = "check" }]
