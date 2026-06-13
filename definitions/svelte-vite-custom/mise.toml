@@ -36,12 +36,7 @@ hide = true
 
 [tasks.test]
 description = "Run all tests"
-run = [
-  { task = "check" },
-  { task = "test:browser", args = [
-    "--browser.headless",
-  ], env = { CI = 'true' } },
-]
+run = [{ task = "check" }, { task = "test:browser", args = ["--browser.headless", "--run"] }]
 
 [tasks."test:browser"]
 description = "Run component tests in-browser"
