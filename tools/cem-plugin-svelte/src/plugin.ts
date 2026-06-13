@@ -1,6 +1,5 @@
-import { resolve } from "node:path";
+import { parse, resolve } from "node:path";
 
-import type tsModule from "@cem-analyzer-dep/typescript";
 import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
 
@@ -19,7 +18,8 @@ export function createPlugin(state: SveltePluginState): Plugin {
       const tagName = parserCache.svelte.options?.customElement?.tag;
       if (!tagName) return;
 
-      const className = node.fileName.replace(".svelte", "");
+      const parsedFileName = parse(node.fileName);
+      const className = parsedFileName.name;
       const absolutePath = resolve(state.cwd, node.fileName);
 
       const members =
