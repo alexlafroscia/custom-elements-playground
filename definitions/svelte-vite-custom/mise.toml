@@ -31,7 +31,7 @@ hide = true
 
 [tasks."check:tests"]
 description = "Type-check test files"
-run = "pnpm exec tsc -p tsconfig.node.json"
+run = "pnpm exec svelte-check --tsconfig ./tsconfig.test.json"
 hide = true
 
 [tasks.test]
