@@ -5,7 +5,7 @@ config_roots = ["definitions/*", "hosts/*", "tools/*"]
 
 [tools]
 node = "24.14.0"
-pnpm = "11.5.2"
+pnpm = "11.6.0"
 
 [deps.pnpm]
 auto = true
