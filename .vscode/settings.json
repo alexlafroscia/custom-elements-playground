@@ -1,3 +1,7 @@
 {
-  "editor.defaultFormatter": "oxc.oxc-vscode"
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+
+  // Type info for custom elements
+  "css.customData": ["./definitions/svelte-vite-custom/vscode.css-custom-data.json"],
+  "html.customData": ["./definitions/svelte-vite-custom/vscode.html-custom-data.json"]
 }
