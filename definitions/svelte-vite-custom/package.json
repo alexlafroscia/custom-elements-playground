@@ -14,10 +14,14 @@
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.12.3",
+    "@vitest/browser-playwright": "^4.1.8",
+    "lit": "^3.3.3",
     "svelte": "^5.55.5",
     "svelte-check": "^4.4.8",
     "typescript": "~6.0.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.8",
+    "vitest-browser-lit": "^1.0.1"
   },
   "customElements": "custom-elements.json"
 }
