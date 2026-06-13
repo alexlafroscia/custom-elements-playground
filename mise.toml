@@ -13,7 +13,7 @@ auto = true
 [deps.husky]
 auto = true
 depends = ["pnpm"]
-run = "pnpm exec husky init"
+run = "pnpm exec husky"
 outputs = [".husky/_"]
 
 [tasks.format]
