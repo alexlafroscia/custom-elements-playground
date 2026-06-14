@@ -1,5 +1,5 @@
 {
-  "name": "@ce-ts-playground/cem-plugin-svelte",
+  "name": "cem-plugin-svelte",
   "version": "0.0.0",
   "private": true,
   "type": "module",

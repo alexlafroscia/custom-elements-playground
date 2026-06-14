@@ -20,9 +20,6 @@ importers:
 
   definitions/svelte-vite-custom:
     devDependencies:
-      '@ce-ts-playground/cem-plugin-svelte':
-        specifier: workspace:*
-        version: link:../../tools/cem-plugin-svelte
       '@custom-elements-manifest/analyzer':
         specifier: ^0.11.0
         version: 0.11.0
@@ -41,6 +38,9 @@ importers:
       cem-plugin-dts:
         specifier: workspace:*
         version: link:../../tools/cem-plugin-dts
+      cem-plugin-svelte:
+        specifier: workspace:*
+        version: link:../../tools/cem-plugin-svelte
       custom-element-vs-code-integration:
         specifier: ^1.5.0
         version: 1.5.0(prettier@3.8.4)

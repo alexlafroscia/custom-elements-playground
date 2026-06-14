@@ -10,13 +10,13 @@
     }
   },
   "devDependencies": {
-    "@ce-ts-playground/cem-plugin-svelte": "workspace:*",
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.12.3",
     "@vitest/browser-playwright": "^4.1.8",
     "cem-plugin-dts": "workspace:*",
+    "cem-plugin-svelte": "workspace:*",
     "custom-element-vs-code-integration": "^1.5.0",
     "lit": "^3.3.3",
     "playwright": "1.60.0",

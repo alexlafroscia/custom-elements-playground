@@ -1,5 +1,5 @@
-import { createSveltePlugin } from "@ce-ts-playground/cem-plugin-svelte";
 import { dts } from "cem-plugin-dts";
+import { createSveltePlugin } from "cem-plugin-svelte";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 
 import svelteConfig from "./svelte.config.js";
