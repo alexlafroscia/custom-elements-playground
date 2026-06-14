@@ -21,7 +21,7 @@ test("props update if mutated internally", async () => {
 
   // Find the DOM node for the Svelte component
   const mutableStateLocator = screen.getByTestId("root");
-  const mutableStateNode: any = mutableStateLocator.element();
+  const mutableStateNode = mutableStateLocator.element() as HTMLMutableInternalStateElement;
 
   // Ensure the internally-set value is surfaced through the DOM node property
   expect(

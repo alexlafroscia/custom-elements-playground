@@ -13,7 +13,7 @@ description = "Build the Custom Elements Manifest"
 run = "pnpm exec cem analyze"
 sources = ["src", "custom-elements-manifest.config.js"]
 outputs = ["custom-elements.json"]
-depends = ["//tools/cem-plugin-svelte:build"]
+depends = ["//tools/cem-plugin-dts:build", "//tools/cem-plugin-svelte:build"]
 
 [tasks.check]
 description = "Run all checks"
@@ -22,6 +22,7 @@ run = [{ task = "check:app" }, { task = "check:node" }, { task = "check:tests" }
 [tasks."check:app"]
 description = "Type-check the source code"
 run = "pnpm exec svelte-check --tsconfig ./tsconfig.app.json"
+depends = ["build:cem"]
 hide = true
 
 [tasks."check:node"]
@@ -32,6 +33,7 @@ hide = true
 [tasks."check:tests"]
 description = "Type-check test files"
 run = "pnpm exec svelte-check --tsconfig ./tsconfig.test.json"
+depends = ["build:cem"]
 hide = true
 
 [tasks.test]

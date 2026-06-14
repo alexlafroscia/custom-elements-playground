@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "types": "./register-types/html-element.d.ts"
     }
   },
   "devDependencies": {
@@ -15,6 +16,7 @@
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.12.3",
     "@vitest/browser-playwright": "^4.1.8",
+    "cem-plugin-dts": "workspace:*",
     "custom-element-vs-code-integration": "^1.5.0",
     "lit": "^3.3.3",
     "playwright": "1.60.0",

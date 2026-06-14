@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "Button.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "MyButton",
+          "tagName": "my-button",
+          "superclass": { "name": "HTMLElement" },
+          "members": [
+            {
+              "kind": "field",
+              "name": "label",
+              "type": { "text": "string" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "Badge.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "MyBadge",
+          "tagName": "my-badge",
+          "superclass": { "name": "HTMLElement" },
+          "members": [
+            {
+              "kind": "field",
+              "name": "count",
+              "type": { "text": "number" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

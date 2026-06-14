@@ -49,7 +49,7 @@ describe("`getName` method", () => {
     );
 
     const locator = screen.getByTestId("root");
-    const element: any = await locator.findElement();
+    const element = locator.element() as any;
 
     expect(element.getName()).toEqual("World");
 

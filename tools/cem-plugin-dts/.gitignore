@@ -11,10 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-custom-elements.json
-register-types
-vscode.css-custom-data.json
-vscode.html-custom-data.json
 
 # Editor directories and files
 .vscode/*

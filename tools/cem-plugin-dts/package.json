@@ -1,0 +1,22 @@
+{
+  "name": "cem-plugin-dts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^24.13.0",
+    "custom-elements-manifest": "^2.1.0",
+    "typescript": "~6.0.2"
+  },
+  "dependencies": {
+    "dts-dom": "^3.7.0"
+  }
+}

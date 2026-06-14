@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "Counter.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Counter",
+          "tagName": "my-counter",
+          "superclass": { "name": "HTMLElement" },
+          "members": [
+            {
+              "kind": "field",
+              "name": "count",
+              "type": { "text": "number" },
+              "description": "The current count"
+            },
+            {
+              "kind": "method",
+              "name": "increment",
+              "description": "Increment the counter",
+              "return": { "type": { "text": "void" } }
+            },
+            {
+              "kind": "method",
+              "name": "add",
+              "parameters": [{ "name": "amount", "type": { "text": "number" } }],
+              "return": { "type": { "text": "void" } }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -38,6 +38,9 @@ importers:
       '@vitest/browser-playwright':
         specifier: ^4.1.8
         version: 4.1.8(playwright@1.60.0)(vite@8.0.16(@types/node@24.13.0)(yaml@2.9.0))(vitest@4.1.8)
+      cem-plugin-dts:
+        specifier: workspace:*
+        version: link:../../tools/cem-plugin-dts
       custom-element-vs-code-integration:
         specifier: ^1.5.0
         version: 1.5.0(prettier@3.8.4)
@@ -65,6 +68,28 @@ importers:
       vitest-browser-lit:
         specifier: ^1.0.1
         version: 1.0.1(lit@3.3.3)(vitest@4.1.8)
+
+  tools/cem-plugin-dts:
+    dependencies:
+      dts-dom:
+        specifier: ^3.7.0
+        version: 3.7.0
+    devDependencies:
+      '@custom-elements-manifest/analyzer':
+        specifier: ^0.11.0
+        version: 0.11.0
+      '@tsconfig/node24':
+        specifier: ^24.0.4
+        version: 24.0.4
+      '@types/node':
+        specifier: ^24.13.0
+        version: 24.13.0
+      custom-elements-manifest:
+        specifier: ^2.1.0
+        version: 2.1.0
+      typescript:
+        specifier: ~6.0.2
+        version: 6.0.3
 
   tools/cem-plugin-svelte:
     dependencies:
@@ -753,6 +778,9 @@ packages:
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
+
+  dts-dom@3.7.0:
+    resolution: {integrity: sha512-WnmiiHfhtcYS+DyGd2Rq3J6QA3ATVBdKtlrhutc/VzQVFoBgNDm+gnYc5gZizsXAI0xQ2frZntT5IJFeB2qQIg==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -1858,6 +1886,8 @@ snapshots:
   dir-glob@3.0.1:
     dependencies:
       path-type: 4.0.0
+
+  dts-dom@3.7.0: {}
 
   emoji-regex@10.6.0: {}
 
