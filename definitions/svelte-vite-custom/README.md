@@ -1,47 +1,112 @@
-# Svelte + TS + Vite
+# `@cem-playground/svelte-vite-custom`
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A playground package demonstrating how to generate Custom Elements Manifests and TypeScript
+type definitions from Svelte custom elements, and how to test them with Vitest Browser.
 
-## Recommended IDE Setup
+## Custom Elements Manifest generation
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+[`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
+analyzes JavaScript and TypeScript source to produce a `custom-elements.json` manifest describing
+a library's custom elements. Out of the box it doesn't understand Svelte, so
+[`cem-plugin-svelte`](../../tools/cem-plugin-svelte/) teaches the analyzer how to extract
+component metadata from `.svelte` files.
 
-## Need an official Svelte framework?
+The config in [`custom-elements-manifest.config.js`](./custom-elements-manifest.config.js) shows
+the full setup:
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+```js
+import { dts } from "cem-plugin-dts";
+import { createSveltePlugin } from "cem-plugin-svelte";
 
-## Technical considerations
+import svelteConfig from "./svelte.config.js";
 
-**Why use this over SvelteKit?**
+const { plugin: svelte, overrideModuleCreation } = createSveltePlugin({
+  compilerOptions: svelteConfig.compilerOptions,
+});
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+export default {
+  globs: ["./src/**/*.svelte"],
+  plugins: [svelte, dts({ path: "./register-types/html-element.d.ts" })],
+  overrideModuleCreation,
+};
+```
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+Running `@custom-elements-manifest/analyzer` with this config produces
+[`custom-elements.json`](./custom-elements.json), which documents every custom element in the
+package — its tag name, properties, methods, and JSDoc descriptions.
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+## HTML Element type definition generation
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+[`cem-plugin-dts`](../../tools/cem-plugin-dts/) is a second CEM plugin (see config above) that
+reads the generated manifest and writes a `.d.ts` file. It produces interface declarations for
+each element and merges them into TypeScript's built-in `HTMLElementTagNameMap`, so that
+`document.querySelector("svelte-vite-custom")` returns the correct type without any manual
+declarations.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+The output at [`register-types/html-element.d.ts`](./register-types/html-element.d.ts):
 
 ```ts
-// store.ts
-// An extremely simple external store
-import { writable } from "svelte/store";
-export default writable(0);
+declare interface HTMLSimpleViteElement extends HTMLElement {
+  /** The name of the person to greet */
+  name: string;
+  /** Return a value from inside of the component */
+  getName(): string;
+}
+
+declare interface HTMLElementTagNameMap {
+  "svelte-vite-custom": HTMLSimpleViteElement;
+  "mutable-state": HTMLMutableInternalStateElement;
+}
 ```
+
+### Consuming the type definitions
+
+The generated `.d.ts` is wired up in two places:
+
+- **Internally** — `tsconfig.svelte.json` lists it under `compilerOptions.types` so that source
+  files within this package see the `HTMLElementTagNameMap` augmentation automatically:
+  ```json
+  { "types": ["svelte", "vite/client", "./register-types/html-element.d.ts"] }
+  ```
+- **Externally** — `package.json` surfaces it as the `types` entry for the package export, so
+  any package that imports `@cem-playground/svelte-vite-custom` receives the same type
+  augmentation:
+  ```json
+  {
+    "exports": {
+      ".": { "import": "./dist/index.js", "types": "./register-types/html-element.d.ts" }
+    }
+  }
+  ```
+
+## Browser testing with mutable properties
+
+The tests run in a real browser via [Vitest Browser](https://vitest.dev/guide/browser/) +
+[Playwright](https://playwright.dev/), and render elements using
+[`vitest-browser-lit`](https://github.com/nickvdyck/vitest-browser-lit) Lit templates.
+
+The interesting DX challenge: when a test needs to update a custom element's property after
+initial render, re-rendering the Lit template manually is verbose and easy to forget.
+[`tests/reactive-render.svelte.ts`](./tests/reactive-render.svelte.ts) solves this with a
+`render()` helper that wraps the Lit renderer in a Svelte `$effect.root()`. Any `$state()`
+variable referenced inside the template is tracked automatically, and the element re-renders
+whenever it changes.
+
+```ts
+test("setting the value as a property", async () => {
+  let value = $state("World");
+
+  // Pass a getter, not a value — $effect tracks reads inside
+  const screen = await render(() => html`<svelte-vite-custom .name=${value}></svelte-vite-custom>`);
+
+  await expect.element(screen.getByText("Hello")).toHaveTextContent(value);
+
+  // Mutate the $state variable — the element re-renders automatically
+  value = "Friend";
+
+  await expect.element(screen.getByText("Hello")).toHaveTextContent(value);
+});
+```
+
+This pattern lets tests read and write element properties directly as plain variables, with
+reactivity handled transparently by the Svelte runtime.
