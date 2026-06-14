@@ -49,7 +49,7 @@ describe("`getName` method", () => {
     );
 
     const locator = screen.getByTestId("root");
-    const element = locator.element() as any;
+    const element = locator.element() as HTMLSimpleViteElement;
 
     expect(element.getName()).toEqual("World");
 

@@ -4,6 +4,7 @@ import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
 
 import { isSvelteFileNode } from "./is-svelte-file.js";
+import { resolveMethods } from "./resolve-methods.js";
 import { resolvePropMembers } from "./resolve-prop-members.js";
 import type { SveltePluginState } from "./state.js";
 
@@ -27,19 +28,33 @@ export function createPlugin(state: SveltePluginState): Plugin {
           ? resolvePropMembers(absolutePath, state.program, state.checker, ts)
           : [];
 
+      const methodMembers =
+        state.checker && state.program
+          ? resolveMethods(absolutePath, state.program, state.checker, ts)
+          : [];
+
       const customElementDeclaration: schema.CustomElementDeclaration = {
         kind: "class",
         customElement: true,
         name: className,
         tagName,
         superclass: { name: "HTMLElement" },
-        members: members.map((m) => ({
-          kind: "field",
-          name: m.name,
-          type: m.type,
-          ...(m.description !== undefined ? { description: m.description } : {}),
-          attribute: m.name,
-        })),
+        members: [
+          ...members.map((m) => ({
+            kind: "field" as const,
+            name: m.name,
+            type: m.type,
+            ...(m.description !== undefined ? { description: m.description } : {}),
+            attribute: m.name,
+          })),
+          ...methodMembers.map((m) => ({
+            kind: "method" as const,
+            name: m.name,
+            ...(m.description !== undefined ? { description: m.description } : {}),
+            parameters: m.parameters,
+            return: m.return,
+          })),
+        ],
         attributes: members.map((m) => ({
           name: m.name,
           type: m.type,

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "WithMethod.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "WithMethod",
+          "tagName": "element-with-method",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "method",
+              "name": "open",
+              "description": "Toggle the \"open\" state of the component",
+              "parameters": [
+                {
+                  "name": "current",
+                  "type": { "text": "boolean" }
+                }
+              ],
+              "return": {
+                "type": { "text": "boolean" }
+              }
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "WithMethod__SvelteComponent_"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "element-with-method",
+          "declaration": {
+            "name": "WithMethod",
+            "module": "WithMethod.svelte"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "WithMethod__SvelteComponent_",
+            "module": "WithMethod.svelte"
+          }
+        }
+      ]
+    }
+  ]
+}
