@@ -1,10 +1,14 @@
-declare interface HTMLGreeterElement extends HTMLElement {
-  /**
-   * The name of the person to greet
-   */
-  name: string;
-}
+export {};
 
-declare interface HTMLElementTagNameMap {
-  "svelte-vite-custom": HTMLGreeterElement;
+declare global {
+  interface HTMLGreeterElement extends HTMLElement {
+    /**
+     * The name of the person to greet
+     */
+    name: string;
+  }
+
+  interface HTMLElementTagNameMap {
+    "svelte-vite-custom": HTMLGreeterElement;
+  }
 }

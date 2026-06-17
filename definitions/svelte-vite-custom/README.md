@@ -26,7 +26,7 @@ const { plugin: svelte, overrideModuleCreation } = createSveltePlugin({
 
 export default {
   globs: ["./src/**/*.svelte"],
-  plugins: [svelte, dts({ path: "./register-types/html-element.d.ts" })],
+  plugins: [svelte, dts({ path: "./register-types/html-element.ts" })],
   overrideModuleCreation,
 };
 ```
@@ -43,41 +43,45 @@ each element and merges them into TypeScript's built-in `HTMLElementTagNameMap`,
 `document.querySelector("svelte-vite-custom")` returns the correct type without any manual
 declarations.
 
-The output at [`register-types/html-element.d.ts`](./register-types/html-element.d.ts):
+The output at `register-types/html-element.ts` uses module form so it can be imported as a side
+effect:
 
 ```ts
-declare interface HTMLSimpleViteElement extends HTMLElement {
-  /** The name of the person to greet */
-  name: string;
-  /** Return a value from inside of the component */
-  getName(): string;
-}
+export {};
 
-declare interface HTMLElementTagNameMap {
-  "svelte-vite-custom": HTMLSimpleViteElement;
-  "mutable-state": HTMLMutableInternalStateElement;
+declare global {
+  interface HTMLSimpleViteElement extends HTMLElement {
+    /** The name of the person to greet */
+    name: string;
+    /** Return a value from inside of the component */
+    getName(): string;
+  }
+
+  interface HTMLElementTagNameMap {
+    "svelte-vite-custom": HTMLSimpleViteElement;
+    "mutable-state": HTMLMutableInternalStateElement;
+  }
 }
 ```
 
 ### Consuming the type definitions
 
-The generated `.d.ts` is wired up in two places:
+`src/index.ts` imports the generated file as a side effect:
 
-- **Internally** — `tsconfig.svelte.json` lists it under `compilerOptions.types` so that source
-  files within this package see the `HTMLElementTagNameMap` augmentation automatically:
-  ```json
-  { "types": ["svelte", "vite/client", "./register-types/html-element.d.ts"] }
-  ```
-- **Externally** — `package.json` surfaces it as the `types` entry for the package export, so
-  any package that imports `@cem-playground/svelte-vite-custom` receives the same type
-  augmentation:
-  ```json
-  {
-    "exports": {
-      ".": { "import": "./dist/index.js", "types": "./register-types/html-element.d.ts" }
-    }
-  }
-  ```
+```ts
+import "../register-types/html-element.js";
+```
+
+Because the import is part of the library's entry point, any consumer that imports
+`@cem-playground/svelte-vite-custom` automatically receives the `HTMLElementTagNameMap`
+augmentations — no extra `tsconfig` configuration required.
+
+For the test suite, which imports individual source files rather than the library entry point,
+`tsconfig.test.json` includes the file directly:
+
+```json
+{ "include": ["tests/**/*.ts", "register-types/html-element.ts"] }
+```
 
 ## Browser testing with mutable properties
 

@@ -14,7 +14,7 @@ that extend the CEM toolchain:
 | Package                                                    | Description                                                           |
 | ---------------------------------------------------------- | --------------------------------------------------------------------- |
 | [`cem-plugin-svelte`](./tools/cem-plugin-svelte/README.md) | Teaches the CEM analyzer to extract metadata from Svelte 5 components |
-| [`cem-plugin-dts`](./tools/cem-plugin-dts/README.md)       | Generates TypeScript `.d.ts` type definitions from a CEM manifest     |
+| [`cem-plugin-dts`](./tools/cem-plugin-dts/README.md)       | Generates TypeScript type definitions from a CEM manifest             |
 
 ### `definitions/`
 

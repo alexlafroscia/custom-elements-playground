@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./register-types/html-element.d.ts"
+      "import": "./dist/index.js"
     }
   },
   "devDependencies": {

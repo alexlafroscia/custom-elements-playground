@@ -56,7 +56,12 @@ export function cemToDts({ customElementsManifest }: Options): string {
   declarations.push(tagNameMap);
 
   // dts-dom@3.7.0 omits the space before `extends` in interface declarations
-  return declarations.map((d) => dom.emit(d).replace(/(\w)(extends )/g, "$1 $2")).join("\n");
+  const inner = declarations
+    .map((d) => dom.emit(d).replace(/(\w)(extends )/g, "$1 $2"))
+    .join("\n")
+    .replace(/^declare /gm, "");
+
+  return `export {};\n\ndeclare global {\n${inner}}\n`;
 }
 
 function mapType(typeText: string): dom.Type {

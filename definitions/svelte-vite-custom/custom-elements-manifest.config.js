@@ -15,7 +15,7 @@ export default {
     svelte,
     customElementVsCodePlugin(),
     dts({
-      path: "./register-types/html-element.d.ts",
+      path: "./register-types/html-element.ts",
     }),
   ],
   overrideModuleCreation,

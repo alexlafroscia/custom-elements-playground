@@ -14,7 +14,7 @@ import { dts } from "cem-plugin-dts";
 
 export default {
   globs: ["./src/**/*.js"],
-  plugins: [dts({ path: "./register-types/html-element.d.ts" })],
+  plugins: [dts({ path: "./register-types/html-element.ts" })],
 };
 ```
 
@@ -22,7 +22,7 @@ export default {
 
 ```ts
 dts({
-  // Path to write the generated .d.ts file to. Required.
+  // Path to write the generated .ts file to. Required.
   path: string,
 
   // Directory to resolve `path` relative to. Defaults to process.cwd().
@@ -36,17 +36,26 @@ Given a manifest documenting a `<svelte-vite-custom>` element with a `name` prop
 `getName()` method, the plugin writes:
 
 ```ts
-declare interface HTMLSimpleViteElement extends HTMLElement {
-  /** The name of the person to greet */
-  name: string;
-  /** Return a value from inside of the component */
-  getName(): string;
-}
+export {};
 
-declare interface HTMLElementTagNameMap {
-  "svelte-vite-custom": HTMLSimpleViteElement;
+declare global {
+  interface HTMLSimpleViteElement extends HTMLElement {
+    /** The name of the person to greet */
+    name: string;
+    /** Return a value from inside of the component */
+    getName(): string;
+  }
+
+  interface HTMLElementTagNameMap {
+    "svelte-vite-custom": HTMLSimpleViteElement;
+  }
 }
 ```
+
+The file uses module form (`export {}`) so it can be imported as a side effect from the
+library's entry point. When a consumer imports the library, TypeScript follows the import chain
+and picks up the `HTMLElementTagNameMap` augmentations automatically — no extra configuration
+required.
 
 Multiple elements in the same manifest are all merged into a single `HTMLElementTagNameMap`
 declaration in one file.
