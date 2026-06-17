@@ -2,7 +2,7 @@
 description = "Build library and types"
 run = "pnpm exec tsc -p tsconfig.src.json"
 sources = ["src/**/*.ts", "tsconfig.src.json"]
-outputs = ["dist"]
+outputs = ["dist/**/*"]
 
 [tasks.test]
 description = "Run the unit tests"
