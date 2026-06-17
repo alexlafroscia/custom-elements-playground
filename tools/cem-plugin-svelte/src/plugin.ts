@@ -23,10 +23,7 @@ export function createPlugin(state: SveltePluginState): Plugin {
       const className = parsedFileName.name;
       const absolutePath = resolve(state.cwd, node.fileName);
 
-      const members =
-        state.checker && state.program
-          ? resolvePropMembers(absolutePath, state.program, state.checker, ts)
-          : [];
+      const members = resolvePropMembers(absolutePath, state, ts);
 
       const methodMembers =
         state.checker && state.program

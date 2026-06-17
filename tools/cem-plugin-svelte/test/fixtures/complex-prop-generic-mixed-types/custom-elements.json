@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "Greeter.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Greeter",
+          "tagName": "svelte-vite-custom",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "greet",
+              "type": {
+                "text": "Snippet<[PersonOptions]>",
+                "references": [
+                  {
+                    "name": "Snippet",
+                    "start": 0,
+                    "end": 7,
+                    "package": "svelte"
+                  },
+                  {
+                    "name": "PersonOptions",
+                    "start": 9,
+                    "end": 22,
+                    "module": "types.ts"
+                  }
+                ]
+              },
+              "attribute": "greet"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "greet",
+              "type": {
+                "text": "Snippet<[PersonOptions]>",
+                "references": [
+                  {
+                    "name": "Snippet",
+                    "start": 0,
+                    "end": 7,
+                    "package": "svelte"
+                  },
+                  {
+                    "name": "PersonOptions",
+                    "start": 9,
+                    "end": 22,
+                    "module": "types.ts"
+                  }
+                ]
+              },
+              "fieldName": "greet"
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "Greeter__SvelteComponent_"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "svelte-vite-custom",
+          "declaration": {
+            "name": "Greeter",
+            "module": "Greeter.svelte"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "Greeter__SvelteComponent_",
+            "module": "Greeter.svelte"
+          }
+        }
+      ]
+    }
+  ]
+}
