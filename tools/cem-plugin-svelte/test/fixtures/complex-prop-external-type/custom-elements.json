@@ -26,23 +26,7 @@
                     "package": "svelte"
                   }
                 ]
-              },
-              "attribute": "children"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "children",
-              "type": {
-                "text": "Snippet<[]>",
-                "references": [
-                  {
-                    "name": "Snippet",
-                    "package": "svelte"
-                  }
-                ]
-              },
-              "fieldName": "children"
+              }
             }
           ]
         },

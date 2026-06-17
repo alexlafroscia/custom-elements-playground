@@ -26,23 +26,7 @@
                     "module": "types.ts"
                   }
                 ]
-              },
-              "attribute": "person"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "person",
-              "type": {
-                "text": "PersonOptions",
-                "references": [
-                  {
-                    "name": "PersonOptions",
-                    "module": "types.ts"
-                  }
-                ]
-              },
-              "fieldName": "person"
+              }
             }
           ]
         },

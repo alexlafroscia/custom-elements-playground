@@ -11,6 +11,7 @@ export interface PropMember {
   name: string;
   type: schema.Type;
   description?: string;
+  attributeEligible: boolean;
 }
 
 function findPropsCallTypeNode(
@@ -99,6 +100,27 @@ function collectTypeReferences(
   }
 }
 
+function isUnionType(type: tsModule.Type, ts: typeof tsModule): type is tsModule.UnionType {
+  return !!(type.flags & ts.TypeFlags.Union);
+}
+
+function isPrimitiveType(type: tsModule.Type, ts: typeof tsModule): boolean {
+  if (isUnionType(type, ts)) {
+    return type.types.every((t) => isPrimitiveType(t, ts));
+  }
+  return !!(
+    type.flags &
+    (ts.TypeFlags.String |
+      ts.TypeFlags.StringLiteral |
+      ts.TypeFlags.Number |
+      ts.TypeFlags.NumberLiteral |
+      ts.TypeFlags.Boolean |
+      ts.TypeFlags.BooleanLiteral |
+      ts.TypeFlags.Null |
+      ts.TypeFlags.Undefined)
+  );
+}
+
 function buildTypeReferences(
   propType: tsModule.Type,
   typeText: string,
@@ -155,6 +177,7 @@ export function resolvePropMembers(
       name: symbol.name,
       type: references.length > 0 ? { text, references } : { text },
       description,
+      attributeEligible: isPrimitiveType(propType, ts),
     };
   });
 }

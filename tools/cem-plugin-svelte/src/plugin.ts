@@ -30,6 +30,8 @@ export function createPlugin(state: SveltePluginState): Plugin {
           ? resolveMethods(absolutePath, state.program, state.checker, ts)
           : [];
 
+      const attributeMembers = members.filter((m) => m.attributeEligible);
+
       const customElementDeclaration: schema.CustomElementDeclaration = {
         kind: "class",
         customElement: true,
@@ -42,7 +44,7 @@ export function createPlugin(state: SveltePluginState): Plugin {
             name: m.name,
             type: m.type,
             ...(m.description !== undefined ? { description: m.description } : {}),
-            attribute: m.name,
+            ...(m.attributeEligible ? { attribute: m.name } : {}),
           })),
           ...methodMembers.map((m) => ({
             kind: "method" as const,
@@ -52,12 +54,16 @@ export function createPlugin(state: SveltePluginState): Plugin {
             return: m.return,
           })),
         ],
-        attributes: members.map((m) => ({
-          name: m.name,
-          type: m.type,
-          ...(m.description !== undefined ? { description: m.description } : {}),
-          fieldName: m.name,
-        })),
+        ...(attributeMembers.length > 0
+          ? {
+              attributes: attributeMembers.map((m) => ({
+                name: m.name,
+                type: m.type,
+                ...(m.description !== undefined ? { description: m.description } : {}),
+                fieldName: m.name,
+              })),
+            }
+          : {}),
       };
 
       moduleDoc.declarations.push(customElementDeclaration);

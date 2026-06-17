@@ -34,31 +34,7 @@
                     "module": "types.ts"
                   }
                 ]
-              },
-              "attribute": "greet"
-            }
-          ],
-          "attributes": [
-            {
-              "name": "greet",
-              "type": {
-                "text": "Snippet<[PersonOptions]>",
-                "references": [
-                  {
-                    "name": "Snippet",
-                    "start": 0,
-                    "end": 7,
-                    "package": "svelte"
-                  },
-                  {
-                    "name": "PersonOptions",
-                    "start": 9,
-                    "end": 22,
-                    "module": "types.ts"
-                  }
-                ]
-              },
-              "fieldName": "greet"
+              }
             }
           ]
         },
