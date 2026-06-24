@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "CustomBaseClass.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "CustomBaseClass",
+          "tagName": "svelte-vite-custom",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": { "text": "string" },
+              "description": "The name of the person to greet",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "someProperty",
+              "type": { "text": "string" },
+              "description": "This is an extra property on the custom base class"
+            },
+            {
+              "kind": "method",
+              "name": "extraMethod",
+              "description": "This is an extra method on the custom base class"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "name",
+              "type": { "text": "string" },
+              "description": "The name of the person to greet",
+              "fieldName": "name"
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "CustomBaseClass__SvelteComponent_"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "svelte-vite-custom",
+          "declaration": {
+            "name": "CustomBaseClass",
+            "module": "CustomBaseClass.svelte"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "CustomBaseClass__SvelteComponent_",
+            "module": "CustomBaseClass.svelte"
+          }
+        }
+      ]
+    }
+  ]
+}

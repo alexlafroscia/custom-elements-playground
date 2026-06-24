@@ -4,6 +4,7 @@ import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
 
 import { isSvelteFileNode } from "./is-svelte-file.js";
+import { resolveBaseClassMembers } from "./resolve-base-class-members.js";
 import { resolveMethods } from "./resolve-methods.js";
 import { resolvePropMembers } from "./resolve-prop-members.js";
 import type { SveltePluginState } from "./state.js";
@@ -30,6 +31,8 @@ export function createPlugin(state: SveltePluginState): Plugin {
           ? resolveMethods(absolutePath, state.program, state.checker, ts)
           : [];
 
+      const baseClassMembers = resolveBaseClassMembers(absolutePath, parserCache);
+
       const attributeMembers = members.filter((m) => m.attributeEligible);
 
       const customElementDeclaration: schema.CustomElementDeclaration = {
@@ -53,6 +56,20 @@ export function createPlugin(state: SveltePluginState): Plugin {
             parameters: m.parameters,
             return: m.return,
           })),
+          ...baseClassMembers.map((m) =>
+            m.kind === "field"
+              ? {
+                  kind: "field" as const,
+                  name: m.name,
+                  ...(m.type !== undefined ? { type: m.type } : {}),
+                  ...(m.description !== undefined ? { description: m.description } : {}),
+                }
+              : {
+                  kind: "method" as const,
+                  name: m.name,
+                  ...(m.description !== undefined ? { description: m.description } : {}),
+                },
+          ),
         ],
         ...(attributeMembers.length > 0
           ? {
