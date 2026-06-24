@@ -1,18 +1,25 @@
 [tasks.build]
 description = "Build all output"
-run = [{ task = "build:src" }, { task = "build:cem" }]
+run = { task = "build:src" }
 
 [tasks."build:src"]
 description = "Build the library"
 run = "pnpm exec vite build"
-sources = ["src", "svelte.config.js", "vite.config.ts"]
-outputs = ["dist"]
+depends = ["build:cem"]
+sources = [
+  "src/**/*",
+  "svelte.config.js",
+  "tsconfig.app.json",
+  "tsconfig.svelte.json",
+  "vite.config.ts",
+]
+outputs = ["dist/**/*"]
 
 [tasks."build:cem"]
 description = "Build the Custom Elements Manifest"
-run = "pnpm exec cem analyze"
-sources = ["src", "custom-elements-manifest.config.js"]
-outputs = ["custom-elements.json"]
+run = ["pnpm exec cem analyze", "pnpm oxfmt ./register-types"]
+sources = ["src/**/*", "custom-elements-manifest.config.js"]
+outputs = ["register-types/**/*", "custom-elements.json"]
 depends = ["//tools/cem-plugin-dts:build", "//tools/cem-plugin-svelte:build"]
 
 [tasks.check]
