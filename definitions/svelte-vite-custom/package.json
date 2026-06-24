@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./register-types/html-element.ts",
       "import": "./dist/index.js"
     }
   },
