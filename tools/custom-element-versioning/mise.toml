@@ -1,0 +1,14 @@
+[tasks.build]
+run = "pnpm exec vite build"
+
+[tasks."check:src"]
+run = "pnpm exec svelte-check --tsconfig ./tsconfig.src.json"
+
+[tasks."check:node"]
+run = "pnpm exec tsc -p tsconfig.node.json"
+
+[tasks.check]
+run = [{ task = ":check:src" }, { task = ":check:node" }]
+
+[tasks.test]
+run = [{ task = ":check" }]
