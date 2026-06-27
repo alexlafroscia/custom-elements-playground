@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "WithComponentDoc.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "WithComponentDoc",
+          "tagName": "with-component-doc",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "description": "A component with documentation.",
+          "slots": [
+            {
+              "name": "",
+              "description": "Default slot content"
+            },
+            {
+              "name": "icon",
+              "description": "An icon to display"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "container",
+              "description": "The outer container element"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "name",
+              "description": "The name prop description"
+            },
+            {
+              "kind": "field",
+              "name": "extra-prop",
+              "type": {
+                "text": "string"
+              },
+              "description": "An extra property not from $props"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "name",
+              "description": "The name attribute description from comment"
+            },
+            {
+              "name": "data-theme",
+              "type": {
+                "text": "string"
+              },
+              "description": "Theme for the component"
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "WithComponentDoc__SvelteComponent_",
+          "description": "A component with documentation."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "with-component-doc",
+          "declaration": {
+            "name": "WithComponentDoc",
+            "module": "WithComponentDoc.svelte"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "WithComponentDoc__SvelteComponent_",
+            "module": "WithComponentDoc.svelte"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,9 @@ import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
 
 import { isSvelteFileNode } from "./is-svelte-file.js";
+import { mergeDocOverrides } from "./merge-doc-overrides.js";
 import { resolveBaseClassMembers } from "./resolve-base-class-members.js";
+import { resolveComponentDoc } from "./resolve-component-doc.js";
 import { resolveMethods } from "./resolve-methods.js";
 import { resolvePropMembers } from "./resolve-prop-members.js";
 import type { SveltePluginState } from "./state.js";
@@ -34,6 +36,79 @@ export function createPlugin(state: SveltePluginState): Plugin {
       const baseClassMembers = resolveBaseClassMembers(absolutePath, parserCache);
 
       const attributeMembers = members.filter((m) => m.attributeEligible);
+      const componentDoc = resolveComponentDoc(parserCache);
+      const {
+        attributes: commentAttributes,
+        props: commentProps,
+        ...componentDocProps
+      } = componentDoc ?? {};
+
+      type AttributeEntry = {
+        name: string;
+        type?: schema.Type;
+        description?: string;
+        fieldName?: string;
+      };
+      type MemberEntry = {
+        kind: "field" | "method";
+        name: string;
+        type?: schema.Type;
+        description?: string;
+        attribute?: string;
+        parameters?: schema.Parameter[];
+        return?: schema.Type;
+      };
+
+      const builtMembers: MemberEntry[] = [
+        ...members.map((m) => ({
+          kind: "field" as const,
+          name: m.name,
+          type: m.type,
+          ...(m.description !== undefined ? { description: m.description } : {}),
+          ...(m.attributeEligible ? { attribute: m.name } : {}),
+        })),
+        ...methodMembers.map((m) => ({
+          kind: "method" as const,
+          name: m.name,
+          ...(m.description !== undefined ? { description: m.description } : {}),
+          parameters: m.parameters,
+          return: m.return,
+        })),
+        ...baseClassMembers.map((m) =>
+          m.kind === "field"
+            ? {
+                kind: "field" as const,
+                name: m.name,
+                ...(m.type !== undefined ? { type: m.type } : {}),
+                ...(m.description !== undefined ? { description: m.description } : {}),
+              }
+            : {
+                kind: "method" as const,
+                name: m.name,
+                ...(m.description !== undefined ? { description: m.description } : {}),
+              },
+        ),
+      ];
+
+      const builtAttributes: AttributeEntry[] = attributeMembers.map((m) => ({
+        name: m.name,
+        type: m.type,
+        ...(m.description !== undefined ? { description: m.description } : {}),
+        fieldName: m.name,
+      }));
+
+      const finalMembers = mergeDocOverrides(builtMembers, commentProps ?? [], (o) => ({
+        kind: "field" as const,
+        name: o.name,
+        ...(o.type !== undefined ? { type: o.type } : {}),
+        ...(o.description !== undefined ? { description: o.description } : {}),
+      }));
+
+      const finalAttributes = mergeDocOverrides(builtAttributes, commentAttributes ?? [], (o) => ({
+        name: o.name,
+        ...(o.type !== undefined ? { type: o.type } : {}),
+        ...(o.description !== undefined ? { description: o.description } : {}),
+      }));
 
       const customElementDeclaration: schema.CustomElementDeclaration = {
         kind: "class",
@@ -41,45 +116,10 @@ export function createPlugin(state: SveltePluginState): Plugin {
         name: className,
         tagName,
         superclass: { name: "HTMLElement" },
-        members: [
-          ...members.map((m) => ({
-            kind: "field" as const,
-            name: m.name,
-            type: m.type,
-            ...(m.description !== undefined ? { description: m.description } : {}),
-            ...(m.attributeEligible ? { attribute: m.name } : {}),
-          })),
-          ...methodMembers.map((m) => ({
-            kind: "method" as const,
-            name: m.name,
-            ...(m.description !== undefined ? { description: m.description } : {}),
-            parameters: m.parameters,
-            return: m.return,
-          })),
-          ...baseClassMembers.map((m) =>
-            m.kind === "field"
-              ? {
-                  kind: "field" as const,
-                  name: m.name,
-                  ...(m.type !== undefined ? { type: m.type } : {}),
-                  ...(m.description !== undefined ? { description: m.description } : {}),
-                }
-              : {
-                  kind: "method" as const,
-                  name: m.name,
-                  ...(m.description !== undefined ? { description: m.description } : {}),
-                },
-          ),
-        ],
-        ...(attributeMembers.length > 0
-          ? {
-              attributes: attributeMembers.map((m) => ({
-                name: m.name,
-                type: m.type,
-                ...(m.description !== undefined ? { description: m.description } : {}),
-                fieldName: m.name,
-              })),
-            }
+        ...(componentDocProps as Partial<schema.CustomElementDeclaration>),
+        members: finalMembers as schema.ClassMember[],
+        ...(finalAttributes.length > 0
+          ? { attributes: finalAttributes as schema.Attribute[] }
           : {}),
       };
 
