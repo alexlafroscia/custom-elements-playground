@@ -9,6 +9,6 @@ declare global {
   }
 
   interface HTMLElementTagNameMap {
-    "svelte-vite-custom": HTMLGreeterElement;
+    "svelte-vite": HTMLGreeterElement;
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@cem-playground/svelte-vite-custom",
+  "name": "@cem-playground/svelte-vite",
   "version": "0.0.0",
   "private": true,
   "type": "module",

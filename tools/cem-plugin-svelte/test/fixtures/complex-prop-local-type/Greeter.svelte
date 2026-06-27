@@ -1,6 +1,6 @@
 <svelte:options
   customElement={{
-    tag: "svelte-vite-custom",
+    tag: "svelte-vite",
   }}
 />
 

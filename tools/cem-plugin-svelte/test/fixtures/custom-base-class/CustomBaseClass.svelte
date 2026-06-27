@@ -1,6 +1,6 @@
 <svelte:options
   customElement={{
-    tag: "svelte-vite-custom",
+    tag: "svelte-vite",
     extend(svelteCustomElementClass) {
       return class extends svelteCustomElementClass {
         /**

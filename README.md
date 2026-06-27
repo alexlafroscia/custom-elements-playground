@@ -20,6 +20,6 @@ that extend the CEM toolchain:
 
 Example component libraries that demonstrate the full workflow end-to-end:
 
-| Package                                                            | Description                                                                                             |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| [`svelte-vite-custom`](./definitions/svelte-vite-custom/README.md) | Svelte 5 custom elements with CEM manifest generation, type definition output, and Vitest Browser tests |
+| Package                                              | Description                                                                                             |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`svelte-vite`](./definitions/svelte-vite/README.md) | Svelte 5 custom elements with CEM manifest generation, type definition output, and Vitest Browser tests |

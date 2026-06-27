@@ -10,7 +10,7 @@
           "kind": "class",
           "customElement": true,
           "name": "CustomBaseClass",
-          "tagName": "svelte-vite-custom",
+          "tagName": "svelte-vite",
           "superclass": {
             "name": "HTMLElement"
           },
@@ -51,7 +51,7 @@
       "exports": [
         {
           "kind": "custom-element-definition",
-          "name": "svelte-vite-custom",
+          "name": "svelte-vite",
           "declaration": {
             "name": "CustomBaseClass",
             "module": "CustomBaseClass.svelte"

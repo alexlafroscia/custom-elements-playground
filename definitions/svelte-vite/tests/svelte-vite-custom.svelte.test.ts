@@ -5,16 +5,14 @@ import "../src/SimpleVite.svelte";
 import { render } from "./reactive-render.svelte";
 
 beforeAll(async () => {
-  await customElements.whenDefined("svelte-vite-custom");
+  await customElements.whenDefined("svelte-vite");
 });
 
 describe("`name` property", () => {
   test("setting the value as a property", async () => {
     let value = $state("World");
 
-    const screen = await render(
-      () => html`<svelte-vite-custom .name=${value}></svelte-vite-custom>`,
-    );
+    const screen = await render(() => html`<svelte-vite .name=${value}></svelte-vite>`);
     const element = screen.getByText("Hello");
 
     await expect.element(element).toHaveTextContent(value);
@@ -27,9 +25,7 @@ describe("`name` property", () => {
   test("setting the value as an attribute", async () => {
     let value = $state("World");
 
-    const screen = await render(
-      () => html`<svelte-vite-custom name=${value}></svelte-vite-custom>`,
-    );
+    const screen = await render(() => html`<svelte-vite name=${value}></svelte-vite>`);
     const element = screen.getByText("Hello");
 
     await expect.element(element).toHaveTextContent(value);
@@ -45,7 +41,7 @@ describe("`getName` method", () => {
     let value = $state("World");
 
     const screen = await render(
-      () => html`<svelte-vite-custom data-testid="root" .name=${value}></svelte-vite-custom>`,
+      () => html`<svelte-vite data-testid="root" .name=${value}></svelte-vite>`,
     );
 
     const locator = screen.getByTestId("root");

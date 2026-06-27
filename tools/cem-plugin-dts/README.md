@@ -32,7 +32,7 @@ dts({
 
 ## Output
 
-Given a manifest documenting a `<svelte-vite-custom>` element with a `name` property and a
+Given a manifest documenting a `<svelte-vite>` element with a `name` property and a
 `getName()` method, the plugin writes:
 
 ```ts
@@ -47,7 +47,7 @@ declare global {
   }
 
   interface HTMLElementTagNameMap {
-    "svelte-vite-custom": HTMLSimpleViteElement;
+    "svelte-vite": HTMLSimpleViteElement;
   }
 }
 ```

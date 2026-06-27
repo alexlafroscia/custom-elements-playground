@@ -10,7 +10,7 @@
           "kind": "class",
           "customElement": true,
           "name": "Greeter",
-          "tagName": "svelte-vite-custom",
+          "tagName": "svelte-vite",
           "superclass": {
             "name": "HTMLElement"
           },
@@ -38,7 +38,7 @@
       "exports": [
         {
           "kind": "custom-element-definition",
-          "name": "svelte-vite-custom",
+          "name": "svelte-vite",
           "declaration": {
             "name": "Greeter",
             "module": "Greeter.svelte"

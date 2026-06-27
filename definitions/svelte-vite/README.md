@@ -1,4 +1,4 @@
-# `@cem-playground/svelte-vite-custom`
+# `@cem-playground/svelte-vite`
 
 A playground package demonstrating how to generate Custom Elements Manifests and TypeScript
 type definitions from Svelte custom elements, and how to test them with Vitest Browser.
@@ -40,7 +40,7 @@ package — its tag name, properties, methods, and JSDoc descriptions.
 [`cem-plugin-dts`](../../tools/cem-plugin-dts/) is a second CEM plugin (see config above) that
 reads the generated manifest and writes a `.d.ts` file. It produces interface declarations for
 each element and merges them into TypeScript's built-in `HTMLElementTagNameMap`, so that
-`document.querySelector("svelte-vite-custom")` returns the correct type without any manual
+`document.querySelector("svelte-vite")` returns the correct type without any manual
 declarations.
 
 The output at `register-types/html-element.ts` uses module form so it can be imported as a side
@@ -58,7 +58,7 @@ declare global {
   }
 
   interface HTMLElementTagNameMap {
-    "svelte-vite-custom": HTMLSimpleViteElement;
+    "svelte-vite": HTMLSimpleViteElement;
     "mutable-state": HTMLMutableInternalStateElement;
   }
 }
@@ -73,7 +73,7 @@ import "../register-types/html-element.js";
 ```
 
 Because the import is part of the library's entry point, any consumer that imports
-`@cem-playground/svelte-vite-custom` automatically receives the `HTMLElementTagNameMap`
+`@cem-playground/svelte-vite` automatically receives the `HTMLElementTagNameMap`
 augmentations — no extra `tsconfig` configuration required.
 
 For the test suite, which imports individual source files rather than the library entry point,
@@ -101,7 +101,7 @@ test("setting the value as a property", async () => {
   let value = $state("World");
 
   // Pass a getter, not a value — $effect tracks reads inside
-  const screen = await render(() => html`<svelte-vite-custom .name=${value}></svelte-vite-custom>`);
+  const screen = await render(() => html`<svelte-vite .name=${value}></svelte-vite>`);
 
   await expect.element(screen.getByText("Hello")).toHaveTextContent(value);
 

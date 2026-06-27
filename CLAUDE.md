@@ -28,7 +28,7 @@ This project uses [`mise`](https://mise.jdx.dev/) to manage tasks. Run tasks wit
 | `mise run test`            | Build, typecheck tests, then run unit tests |
 | `mise run typecheck:tests` | Type-check test files only                  |
 
-### `definitions/svelte-vite-custom`
+### `definitions/svelte-vite`
 
 | Task                    | Description                                      |
 | ----------------------- | ------------------------------------------------ |
@@ -41,4 +41,4 @@ This project uses [`mise`](https://mise.jdx.dev/) to manage tasks. Run tasks wit
 
 ### Cross-package references
 
-`mise` supports cross-package task dependencies using the `//path/to/package:task` syntax. For example, `build:cem` in `definitions/svelte-vite-custom` depends on `//tools/cem-plugin-dts:build` and `//tools/cem-plugin-svelte:build`, so those tool packages are built automatically when needed.
+`mise` supports cross-package task dependencies using the `//path/to/package:task` syntax. For example, `build:cem` in `definitions/svelte-vite` depends on `//tools/cem-plugin-dts:build` and `//tools/cem-plugin-svelte:build`, so those tool packages are built automatically when needed.

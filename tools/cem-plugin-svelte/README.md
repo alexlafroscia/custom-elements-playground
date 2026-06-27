@@ -55,7 +55,7 @@ the plugin generates a CEM class declaration with:
   "kind": "class",
   "customElement": true,
   "name": "SimpleVite",
-  "tagName": "svelte-vite-custom",
+  "tagName": "svelte-vite",
   "members": [
     {
       "kind": "field",
