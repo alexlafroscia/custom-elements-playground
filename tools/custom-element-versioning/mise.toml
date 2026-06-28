@@ -3,12 +3,36 @@ run = "pnpm exec vite build"
 
 [tasks."check:src"]
 run = "pnpm exec svelte-check --tsconfig ./tsconfig.src.json"
+hide = true
 
 [tasks."check:node"]
 run = "pnpm exec tsc -p tsconfig.node.json"
+hide = true
+
+[tasks."check:tests"]
+description = "Type-check test files"
+run = "pnpm exec svelte-check --tsconfig ./tsconfig.test.json"
+hide = true
 
 [tasks.check]
-run = [{ task = ":check:src" }, { task = ":check:node" }]
+run = [{ task = ":check:src" }, { task = ":check:node" }, { task = ":check:tests" }]
 
 [tasks.test]
-run = [{ task = ":check" }]
+run = [{ task = ":check" }, { task = ":test:browser", args = ["--run"] }]
+
+[tasks."test:browser"]
+description = "Run component tests in-browser"
+run = "pnpm exec vitest --config=vitest.browser.config.ts"
+depends = ["playwright:install"]
+
+[tasks."playwright:install"]
+description = "Install playwright browser dependencies"
+run = """
+if [ "$CI" = "true" ]; then
+  pnpm exec playwright install chromium-headless-shell --with-deps
+else
+  pnpm exec playwright install chromium --with-deps
+fi
+"""
+hide = true
+
