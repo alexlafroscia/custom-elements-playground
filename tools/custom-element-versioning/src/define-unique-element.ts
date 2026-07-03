@@ -7,10 +7,14 @@ function makeUniqueName() {
     length: 2,
   });
 }
-export function defineUniqueElement(constructor: CustomElementConstructor): string {
+
+export function defineUniqueElement(
+  constructor: CustomElementConstructor,
+  registry: CustomElementRegistry = window.customElements,
+): string {
   const name = makeUniqueName();
 
-  window.customElements.define(name, constructor);
+  registry.define(name, constructor);
 
   return name;
 }

@@ -1,9 +1,9 @@
 import { html, unsafeStatic } from "lit/static-html.js";
 import { test, expect } from "vitest";
 
+import { defineUniqueElement } from "../src/define-unique-element";
 import GreeterEnglish from "./fixtures/GreeterEnglish.svelte";
 import GreeterItalian from "./fixtures/GreeterItalian.svelte";
-import { defineUniqueElement } from "./helpers/define-unique-element";
 import { initializeRegistry as initialize } from "./helpers/lit-refs";
 import { render } from "./helpers/reactive-render.svelte";
 
