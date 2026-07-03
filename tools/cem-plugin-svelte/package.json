@@ -8,6 +8,10 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "src/",
+    "dist/"
+  ],
   "dependencies": {
     "@cem-analyzer-dep/typescript": "npm:typescript@5.4.5",
     "comment-parser": "^1.2.4"
