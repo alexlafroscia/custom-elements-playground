@@ -12,7 +12,7 @@ test("props update if mutated internally", async () => {
   let value = $state("World");
 
   const screen = await render(
-    () => html`<mutable-state data-testid="root" .expose=${value}></mutable-internal-state>`,
+    () => html`<mutable-state data-testid="root" .expose=${value}></mutable-state>`,
   );
 
   // Find the button to click on based on the initial value
