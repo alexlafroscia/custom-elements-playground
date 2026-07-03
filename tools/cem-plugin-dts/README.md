@@ -1,11 +1,12 @@
 # `cem-plugin-dts`
 
-A plugin for [`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
+A plugin for
+[`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
 that generates TypeScript type definitions from a `custom-elements.json` manifest.
 
-For each custom element in the manifest it produces an `HTMLXxxElement` interface and merges it
-into TypeScript's built-in `HTMLElementTagNameMap`, so that
-`document.querySelector("my-element")` returns the correct type without any manual declarations.
+For each custom element in the manifest it produces an `HTMLXxxElement` interface and merges it into
+TypeScript's built-in `HTMLElementTagNameMap`, so that `document.querySelector("my-element")`
+returns the correct type without any manual declarations.
 
 ## Usage
 
@@ -32,8 +33,8 @@ dts({
 
 ## Output
 
-Given a manifest documenting a `simple-greeter` element with a `name` property and a
-`getGreeting()` method, the plugin writes:
+Given a manifest documenting a `simple-greeter` element with a `name` property and a `getGreeting()`
+method, the plugin writes:
 
 ```ts
 export {};
@@ -59,11 +60,11 @@ The emitted file is a module (`export {}`) so it can be explicitly imported libr
 import "./components.d.ts;
 ```
 
-When a consumer imports your library library, TypeScript will follow the import chain and picks up the
-`HTMLElementTagNameMap` augmentations automatically — no extra configuration required.
+When a consumer imports your library library, TypeScript will follow the import chain and picks up
+the `HTMLElementTagNameMap` augmentations automatically — no extra configuration required.
 
-Multiple elements in the same manifest are all merged into a single `HTMLElementTagNameMap` declaration in
-one file.
+Multiple elements in the same manifest are all merged into a single `HTMLElementTagNameMap`
+declaration in one file.
 
 ## Project Setup Considerations
 

@@ -4,5 +4,7 @@
   "sortImports": true,
 
   // This seems like it might have behaved differently locally vs CI
-  "sortPackageJson": false
+  "sortPackageJson": false,
+
+  "proseWrap": "always"
 }

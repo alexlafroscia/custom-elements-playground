@@ -1,14 +1,15 @@
 # Custom Element Type-Checking Playground
 
-A monorepo for exploring how to author, document, and type-check custom elements — with a
-particular focus on getting full TypeScript coverage across the boundary between a custom element
-library and the code that consumes it.
+A monorepo for exploring how to author, document, and type-check custom elements — with a particular
+focus on getting full TypeScript coverage across the boundary between a custom element library and
+the code that consumes it.
 
 ## Structure
 
 ### `tools/`
 
-Reusable plugins for [`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
+Reusable plugins for
+[`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
 that extend the CEM toolchain:
 
 | Package                                                    | Description                                                           |

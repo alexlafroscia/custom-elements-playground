@@ -1,18 +1,18 @@
 # `@cem-playground/svelte-vite`
 
-A playground package demonstrating how to generate Custom Elements Manifests and TypeScript
-type definitions from Svelte custom elements, and how to test them with Vitest Browser.
+A playground package demonstrating how to generate Custom Elements Manifests and TypeScript type
+definitions from Svelte custom elements, and how to test them with Vitest Browser.
 
 ## Custom Elements Manifest generation
 
 [`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
-analyzes JavaScript and TypeScript source to produce a `custom-elements.json` manifest describing
-a library's custom elements. Out of the box it doesn't understand Svelte, so
-[`cem-plugin-svelte`](../../tools/cem-plugin-svelte/) teaches the analyzer how to extract
-component metadata from `.svelte` files.
+analyzes JavaScript and TypeScript source to produce a `custom-elements.json` manifest describing a
+library's custom elements. Out of the box it doesn't understand Svelte, so
+[`cem-plugin-svelte`](../../tools/cem-plugin-svelte/) teaches the analyzer how to extract component
+metadata from `.svelte` files.
 
-The config in [`custom-elements-manifest.config.js`](./custom-elements-manifest.config.js) shows
-the full setup:
+The config in [`custom-elements-manifest.config.js`](./custom-elements-manifest.config.js) shows the
+full setup:
 
 ```js
 import { dts } from "cem-plugin-dts";
@@ -37,11 +37,10 @@ package — its tag name, properties, methods, and JSDoc descriptions.
 
 ## HTML Element type definition generation
 
-[`cem-plugin-dts`](../../tools/cem-plugin-dts/) is a second CEM plugin (see config above) that
-reads the generated manifest and writes a `.d.ts` file. It produces interface declarations for
-each element and merges them into TypeScript's built-in `HTMLElementTagNameMap`, so that
-`document.querySelector("svelte-vite")` returns the correct type without any manual
-declarations.
+[`cem-plugin-dts`](../../tools/cem-plugin-dts/) is a second CEM plugin (see config above) that reads
+the generated manifest and writes a `.d.ts` file. It produces interface declarations for each
+element and merges them into TypeScript's built-in `HTMLElementTagNameMap`, so that
+`document.querySelector("svelte-vite")` returns the correct type without any manual declarations.
 
 The output at `register-types/html-element.ts` uses module form so it can be imported as a side
 effect:
@@ -73,8 +72,8 @@ import "../register-types/html-element.js";
 ```
 
 Because the import is part of the library's entry point, any consumer that imports
-`@cem-playground/svelte-vite` automatically receives the `HTMLElementTagNameMap`
-augmentations — no extra `tsconfig` configuration required.
+`@cem-playground/svelte-vite` automatically receives the `HTMLElementTagNameMap` augmentations — no
+extra `tsconfig` configuration required.
 
 For the test suite, which imports individual source files rather than the library entry point,
 `tsconfig.test.json` includes the file directly:
@@ -89,12 +88,11 @@ The tests run in a real browser via [Vitest Browser](https://vitest.dev/guide/br
 [Playwright](https://playwright.dev/), and render elements using
 [`vitest-browser-lit`](https://github.com/nickvdyck/vitest-browser-lit) Lit templates.
 
-The interesting DX challenge: when a test needs to update a custom element's property after
-initial render, re-rendering the Lit template manually is verbose and easy to forget.
-[`tests/reactive-render.svelte.ts`](./tests/reactive-render.svelte.ts) solves this with a
-`render()` helper that wraps the Lit renderer in a Svelte `$effect.root()`. Any `$state()`
-variable referenced inside the template is tracked automatically, and the element re-renders
-whenever it changes.
+The interesting DX challenge: when a test needs to update a custom element's property after initial
+render, re-rendering the Lit template manually is verbose and easy to forget.
+[`tests/reactive-render.svelte.ts`](./tests/reactive-render.svelte.ts) solves this with a `render()`
+helper that wraps the Lit renderer in a Svelte `$effect.root()`. Any `$state()` variable referenced
+inside the template is tracked automatically, and the element re-renders whenever it changes.
 
 ```ts
 test("setting the value as a property", async () => {

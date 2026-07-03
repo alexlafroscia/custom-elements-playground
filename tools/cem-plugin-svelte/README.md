@@ -1,12 +1,13 @@
 # `cem-plugin-svelte`
 
-A plugin for [`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
+A plugin for
+[`@custom-elements-manifest/analyzer`](https://custom-elements-manifest.open-wc.org/analyzer/getting-started/)
 that teaches it how to extract custom element metadata from Svelte 5 components.
 
-The analyzer understands JavaScript and TypeScript out of the box, but not Svelte. This plugin
-uses [`svelte2tsx`](https://github.com/sveltejs/language-tools/tree/master/packages/svelte2tsx)
-to compile each `.svelte` file to TSX, then uses the TypeScript compiler to resolve prop types
-and extract exported methods — including types imported from other files.
+The analyzer understands JavaScript and TypeScript out of the box, but not Svelte. This plugin uses
+[`svelte2tsx`](https://github.com/sveltejs/language-tools/tree/master/packages/svelte2tsx) to
+compile each `.svelte` file to TSX, then uses the TypeScript compiler to resolve prop types and
+extract exported methods — including types imported from other files.
 
 ## Usage
 
@@ -43,9 +44,12 @@ createSveltePlugin({
 
 ## Output
 
-For each Svelte component configured as a custom element via `<svelte:options customElement>`, the plugin generates a CEM `CustomElementDeclaration`.
+For each Svelte component configured as a custom element via `<svelte:options customElement>`, the
+plugin generates a CEM `CustomElementDeclaration`.
 
-JSDoc Annotations are expected to be found in the primary comment ([annotated with `@component`](https://svelte.dev/docs/svelte/faq#How-do-I-document-my-components)) containing your component's documentation.
+JSDoc Annotations are expected to be found in the primary comment
+([annotated with `@component`](https://svelte.dev/docs/svelte/faq#How-do-I-document-my-components))
+containing your component's documentation.
 
 | CEM feature            | Native                                   | JSDoc Annotation                   |
 | ---------------------- | ---------------------------------------- | ---------------------------------- |
@@ -70,5 +74,7 @@ JSDoc Annotations are expected to be found in the primary comment ([annotated wi
 
 ### Additional behaviors
 
-- Types are resolved through the TypeScript compiler,following imports across files and packages. JSDoc on the prop type definition is used as the description.
-- Fields and methods defined in the inline class passed to `customElement.extend` are included in the declaration.
+- Types are resolved through the TypeScript compiler,following imports across files and packages.
+  JSDoc on the prop type definition is used as the description.
+- Fields and methods defined in the inline class passed to `customElement.extend` are included in
+  the declaration.

@@ -2,7 +2,8 @@
 
 ## Running Scripts
 
-This project uses [`mise`](https://mise.jdx.dev/) to manage tasks. Run tasks with `mise run <task>` from the relevant package directory (or from the root for workspace-level tasks).
+This project uses [`mise`](https://mise.jdx.dev/) to manage tasks. Run tasks with `mise run <task>`
+from the relevant package directory (or from the root for workspace-level tasks).
 
 ### Root workspace
 
@@ -41,4 +42,6 @@ This project uses [`mise`](https://mise.jdx.dev/) to manage tasks. Run tasks wit
 
 ### Cross-package references
 
-`mise` supports cross-package task dependencies using the `//path/to/package:task` syntax. For example, `build:cem` in `definitions/svelte-vite` depends on `//tools/cem-plugin-dts:build` and `//tools/cem-plugin-svelte:build`, so those tool packages are built automatically when needed.
+`mise` supports cross-package task dependencies using the `//path/to/package:task` syntax. For
+example, `build:cem` in `definitions/svelte-vite` depends on `//tools/cem-plugin-dts:build` and
+`//tools/cem-plugin-svelte:build`, so those tool packages are built automatically when needed.
