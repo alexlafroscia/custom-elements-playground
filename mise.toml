@@ -5,6 +5,7 @@ config_roots = ["definitions/*", "hosts/*", "tools/*"]
 
 [tools]
 node = "24.14.0"
+npm = "11.5.1"
 pnpm = "11.6.0"
 
 [deps.pnpm]
@@ -31,4 +32,10 @@ run = [{ task = "format:check" }]
 [tasks."husky:pre-commit"]
 description = "Called by `husky` on pre-commit"
 run = "pnpm exec lint-staged"
+hide = true
+
+[tasks."release"]
+description = "Publish a release using `changesets`"
+run = "pnpm changeset publish"
+depends = ["//tools/...:build"]
 hide = true
