@@ -34,6 +34,10 @@ description = "Called by `husky` on pre-commit"
 run = "pnpm exec lint-staged"
 hide = true
 
+[tasks.changeset]
+description = "Create a changeset to add to the changelog"
+run = "pnpm exec changeset"
+
 [tasks."release"]
 description = "Publish a release using `changesets`"
 run = "pnpm changeset publish"
