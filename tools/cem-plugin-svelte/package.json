@@ -12,6 +12,10 @@
     "src/",
     "dist/"
   ],
+  "repository": {
+    "url": "https://github.com/alexlafroscia/custom-elements-playground",
+    "directory": "tools/cem-plugin-svelte"
+  },
   "dependencies": {
     "@cem-analyzer-dep/typescript": "npm:typescript@5.4.5",
     "comment-parser": "^1.2.4"

@@ -12,14 +12,18 @@
     "src/",
     "dist/"
   ],
+  "repository": {
+    "url": "https://github.com/alexlafroscia/custom-elements-playground",
+    "directory": "tools/cem-plugin-dts"
+  },
+  "dependencies": {
+    "dts-dom": "^3.7.0"
+  },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.13.0",
     "custom-elements-manifest": "^2.1.0",
     "typescript": "~6.0.2"
-  },
-  "dependencies": {
-    "dts-dom": "^3.7.0"
   }
 }
