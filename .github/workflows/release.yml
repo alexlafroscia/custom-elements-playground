@@ -30,6 +30,7 @@ jobs:
       - name: Create Release PR or Publish
         uses: changesets/action@v1
         with:
-          publish: mise release
+          version: mise run //:changeset:version
+          publish: mise run //:changeset:release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

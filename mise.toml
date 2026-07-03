@@ -38,8 +38,14 @@ hide = true
 description = "Create a changeset to add to the changelog"
 run = "pnpm exec changeset"
 
-[tasks."release"]
+[tasks."changeset:version"]
+description = "Apply pending changesets"
+run = "pnpm exec changeset version"
+depends_post = ["format"]
+hide = true
+
+[tasks."changeset:release"]
 description = "Publish a release using `changesets`"
-run = "pnpm changeset publish"
+run = "pnpm exec changeset publish"
 depends = ["//tools/...:build"]
 hide = true
