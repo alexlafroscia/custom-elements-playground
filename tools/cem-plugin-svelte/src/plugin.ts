@@ -4,6 +4,7 @@ import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
 
 import { isSvelteFileNode } from "./is-svelte-file.js";
+import type { AttributeEntry, FieldEntry, MemberEntry } from "./manifest-entries.js";
 import { mergeDocOverrides } from "./merge-doc-overrides.js";
 import { resolveBaseClassMembers } from "./resolve-base-class-members.js";
 import { resolveComponentDoc } from "./resolve-component-doc.js";
@@ -26,7 +27,11 @@ export function createPlugin(state: SveltePluginState): Plugin {
       const className = parsedFileName.name;
       const absolutePath = resolve(state.cwd, node.fileName);
 
-      const members = resolvePropMembers(absolutePath, state, ts);
+      const { members: propMembers, attributes: propAttributes } = resolvePropMembers(
+        absolutePath,
+        state,
+        ts,
+      );
 
       const methodMembers =
         state.checker && state.program
@@ -35,7 +40,6 @@ export function createPlugin(state: SveltePluginState): Plugin {
 
       const baseClassMembers = resolveBaseClassMembers(absolutePath, parserCache);
 
-      const attributeMembers = members.filter((m) => m.attributeEligible);
       const componentDoc = resolveComponentDoc(parserCache);
       const {
         attributes: commentAttributes,
@@ -43,72 +47,28 @@ export function createPlugin(state: SveltePluginState): Plugin {
         ...componentDocProps
       } = componentDoc ?? {};
 
-      type AttributeEntry = {
-        name: string;
-        type?: schema.Type;
-        description?: string;
-        fieldName?: string;
-      };
-      type MemberEntry = {
-        kind: "field" | "method";
-        name: string;
-        type?: schema.Type;
-        description?: string;
-        attribute?: string;
-        parameters?: schema.Parameter[];
-        return?: schema.Type;
-      };
+      const builtMembers: MemberEntry[] = [...propMembers, ...methodMembers, ...baseClassMembers];
 
-      const builtMembers: MemberEntry[] = [
-        ...members.map((m) => ({
-          kind: "field" as const,
-          name: m.name,
-          type: m.type,
-          ...(m.description !== undefined ? { description: m.description } : {}),
-          ...(m.attributeEligible ? { attribute: m.name } : {}),
-        })),
-        ...methodMembers.map((m) => ({
-          kind: "method" as const,
-          name: m.name,
-          ...(m.description !== undefined ? { description: m.description } : {}),
-          parameters: m.parameters,
-          return: m.return,
-        })),
-        ...baseClassMembers.map((m) =>
-          m.kind === "field"
-            ? {
-                kind: "field" as const,
-                name: m.name,
-                ...(m.type !== undefined ? { type: m.type } : {}),
-                ...(m.description !== undefined ? { description: m.description } : {}),
-              }
-            : {
-                kind: "method" as const,
-                name: m.name,
-                ...(m.description !== undefined ? { description: m.description } : {}),
-              },
-        ),
-      ];
+      const finalMembers = mergeDocOverrides(
+        builtMembers,
+        commentProps ?? [],
+        (o): FieldEntry => ({
+          kind: "field",
+          name: o.name,
+          ...(o.type !== undefined ? { type: o.type } : {}),
+          ...(o.description !== undefined ? { description: o.description } : {}),
+        }),
+      );
 
-      const builtAttributes: AttributeEntry[] = attributeMembers.map((m) => ({
-        name: m.name,
-        type: m.type,
-        ...(m.description !== undefined ? { description: m.description } : {}),
-        fieldName: m.name,
-      }));
-
-      const finalMembers = mergeDocOverrides(builtMembers, commentProps ?? [], (o) => ({
-        kind: "field" as const,
-        name: o.name,
-        ...(o.type !== undefined ? { type: o.type } : {}),
-        ...(o.description !== undefined ? { description: o.description } : {}),
-      }));
-
-      const finalAttributes = mergeDocOverrides(builtAttributes, commentAttributes ?? [], (o) => ({
-        name: o.name,
-        ...(o.type !== undefined ? { type: o.type } : {}),
-        ...(o.description !== undefined ? { description: o.description } : {}),
-      }));
+      const finalAttributes = mergeDocOverrides(
+        propAttributes,
+        commentAttributes ?? [],
+        (o): AttributeEntry => ({
+          name: o.name,
+          ...(o.type !== undefined ? { type: o.type } : {}),
+          ...(o.description !== undefined ? { description: o.description } : {}),
+        }),
+      );
 
       const customElementDeclaration: schema.CustomElementDeclaration = {
         kind: "class",
@@ -117,10 +77,8 @@ export function createPlugin(state: SveltePluginState): Plugin {
         tagName,
         superclass: { name: "HTMLElement" },
         ...(componentDocProps as Partial<schema.CustomElementDeclaration>),
-        members: finalMembers as schema.ClassMember[],
-        ...(finalAttributes.length > 0
-          ? { attributes: finalAttributes as schema.Attribute[] }
-          : {}),
+        members: finalMembers,
+        ...(finalAttributes.length > 0 ? { attributes: finalAttributes } : {}),
       };
 
       moduleDoc.declarations.push(customElementDeclaration);

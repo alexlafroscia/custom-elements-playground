@@ -1,11 +1,6 @@
 import type tsModule from "@cem-analyzer-dep/typescript";
 
-export interface MethodMember {
-  name: string;
-  description?: string;
-  parameters: { name: string; type: { text: string } }[];
-  return: { type: { text: string } };
-}
+import type { MethodEntry } from "./manifest-entries.js";
 
 function getExportedMethodNames(
   sourceFile: tsModule.SourceFile,
@@ -34,14 +29,14 @@ export function resolveMethods(
   program: tsModule.Program,
   checker: tsModule.TypeChecker,
   ts: typeof tsModule,
-): MethodMember[] {
+): MethodEntry[] {
   const sourceFile = program.getSourceFile(absoluteSveltePath + ".tsx");
   if (!sourceFile) return [];
 
   const exportedNames = getExportedMethodNames(sourceFile, ts, checker);
   if (exportedNames.size === 0) return [];
 
-  const methods: MethodMember[] = [];
+  const methods: MethodEntry[] = [];
 
   function walk(node: tsModule.Node) {
     if (ts.isFunctionDeclaration(node) && node.name && exportedNames.has(node.name.text)) {
@@ -62,6 +57,7 @@ export function resolveMethods(
       }));
 
       methods.push({
+        kind: "method",
         name: node.name.text,
         ...(description ? { description } : {}),
         parameters,

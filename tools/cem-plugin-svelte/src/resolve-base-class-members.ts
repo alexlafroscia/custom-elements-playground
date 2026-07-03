@@ -1,21 +1,7 @@
 import { readFileSync } from "node:fs";
 
+import type { MemberEntry } from "./manifest-entries.js";
 import type { ParserCacheEntry } from "./parser-cache.js";
-
-export interface BaseClassField {
-  kind: "field";
-  name: string;
-  description?: string;
-  type?: { text: string };
-}
-
-export interface BaseClassMethod {
-  kind: "method";
-  name: string;
-  description?: string;
-}
-
-export type BaseClassMember = BaseClassField | BaseClassMethod;
 
 function parseJSDocComment(value: string): string | undefined {
   const lines = value
@@ -54,7 +40,7 @@ function findExtendClassBody(extend: unknown): unknown[] {
 export function resolveBaseClassMembers(
   absoluteSveltePath: string,
   cache: ParserCacheEntry,
-): BaseClassMember[] {
+): MemberEntry[] {
   const extend = cache.svelte.options?.customElement?.extend;
   if (!extend) return [];
 
@@ -62,7 +48,7 @@ export function resolveBaseClassMembers(
   if (classBodyMembers.length === 0) return [];
 
   const source = readFileSync(absoluteSveltePath, "utf-8");
-  const members: BaseClassMember[] = [];
+  const members: MemberEntry[] = [];
 
   for (const member of classBodyMembers as any[]) {
     if (member.type === "PropertyDefinition" && !member.static) {

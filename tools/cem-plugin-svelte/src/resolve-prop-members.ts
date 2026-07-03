@@ -3,15 +3,14 @@ import { relative } from "node:path";
 import type tsModule from "@cem-analyzer-dep/typescript";
 import type * as schema from "custom-elements-manifest";
 
+import type { AttributeEntry, FieldEntry } from "./manifest-entries.js";
 import type { SveltePluginState } from "./state.js";
 
 type TypeReference = schema.TypeReference;
 
-export interface PropMember {
-  name: string;
-  type: schema.Type;
-  description?: string;
-  attributeEligible: boolean;
+export interface ResolvedProps {
+  members: FieldEntry[];
+  attributes: AttributeEntry[];
 }
 
 function findPropsCallTypeNode(
@@ -145,21 +144,25 @@ export function resolvePropMembers(
   absoluteSveltePath: string,
   state: SveltePluginState,
   ts: typeof tsModule,
-): PropMember[] {
+): ResolvedProps {
   const { program, checker, cwd } = state;
-  if (!program || !checker) return [];
+  const empty: ResolvedProps = { members: [], attributes: [] };
+  if (!program || !checker) return empty;
 
   const sourceFile = program.getSourceFile(absoluteSveltePath + ".tsx");
-  if (!sourceFile) return [];
+  if (!sourceFile) return empty;
 
   const typeNode = findPropsCallTypeNode(sourceFile, ts);
-  if (!typeNode) return [];
+  if (!typeNode) return empty;
 
   const type = checker.getTypeFromTypeNode(typeNode);
   const properties = checker.getPropertiesOfType(type);
   const importSpecifiers = buildImportSpecifierMap(sourceFile, checker, ts);
 
-  return properties.map((symbol) => {
+  const members: FieldEntry[] = [];
+  const attributes: AttributeEntry[] = [];
+
+  for (const symbol of properties) {
     const propType = checker.getTypeOfSymbol(symbol);
     const docParts = symbol.getDocumentationComment(checker);
     const description =
@@ -172,12 +175,26 @@ export function resolvePropMembers(
 
     const text = checker.typeToString(propType);
     const references = buildTypeReferences(propType, text, cwd, importSpecifiers, checker, ts);
+    const propManifestType: schema.Type = references.length > 0 ? { text, references } : { text };
+    const attributeEligible = isPrimitiveType(propType, ts);
 
-    return {
+    members.push({
+      kind: "field",
       name: symbol.name,
-      type: references.length > 0 ? { text, references } : { text },
-      description,
-      attributeEligible: isPrimitiveType(propType, ts),
-    };
-  });
+      type: propManifestType,
+      ...(description !== undefined ? { description } : {}),
+      ...(attributeEligible ? { attribute: symbol.name } : {}),
+    });
+
+    if (attributeEligible) {
+      attributes.push({
+        name: symbol.name,
+        type: propManifestType,
+        ...(description !== undefined ? { description } : {}),
+        fieldName: symbol.name,
+      });
+    }
+  }
+
+  return { members, attributes };
 }
