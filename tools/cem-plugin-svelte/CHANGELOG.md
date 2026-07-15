@@ -1,5 +1,21 @@
 # cem-plugin-svelte
 
+## 1.1.0
+
+### Minor Changes
+
+- 2b4daa7: Honor `tsconfig.json` when resolving prop types, so globally-declared types (for example,
+  from `types`/`typeRoots`) can be resolved. A new `tsconfigPath` option controls which config file
+  is used, falling back to `<cwd>/tsconfig.json`. Globally-available types are now labeled with the
+  manifest schema's `global:` package convention in type references.
+
+### Patch Changes
+
+- 65b9637: Preserve `undefined` in prop and method types. The type-resolution program now enables
+  `strictNullChecks` by default (a tsconfig that explicitly disables it still wins), so types like
+  `HTMLElement | undefined` are no longer reported as `HTMLElement` in the manifest and generated
+  `.d.ts` files.
+
 ## 1.0.1
 
 ### Patch Changes
