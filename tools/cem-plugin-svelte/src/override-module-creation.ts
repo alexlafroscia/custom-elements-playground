@@ -17,6 +17,11 @@ function loadTsCompilerOptions(
   state: SveltePluginState,
   ts: typeof tsModule,
 ): tsModule.CompilerOptions {
+  // Without `strictNullChecks` the checker erases `undefined` from unions, so
+  // types like `HTMLElement | undefined` would be reported as `HTMLElement`.
+  // A tsconfig that explicitly disables it takes precedence.
+  const defaultOptions: tsModule.CompilerOptions = { strict: false, strictNullChecks: true };
+
   const configPath = state.tsconfigPath
     ? resolve(state.cwd, state.tsconfigPath)
     : resolve(state.cwd, "tsconfig.json");
@@ -25,7 +30,7 @@ function loadTsCompilerOptions(
     if (state.tsconfigPath) {
       throw new Error(`Could not find tsconfig file at \`${configPath}\``);
     }
-    return { strict: false };
+    return defaultOptions;
   }
 
   const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile);
@@ -33,7 +38,10 @@ function loadTsCompilerOptions(
     throw new Error(ts.flattenDiagnosticMessageText(error.messageText, "\n"));
   }
 
-  return ts.parseJsonConfigFileContent(config, ts.sys, dirname(configPath)).options;
+  return {
+    ...defaultOptions,
+    ...ts.parseJsonConfigFileContent(config, ts.sys, dirname(configPath)).options,
+  };
 }
 
 export function createOverrideModuleCreation(state: SveltePluginState): OverrideModuleCreation {
