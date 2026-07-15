@@ -52,16 +52,41 @@ function buildImportSpecifierMap(
   return map;
 }
 
+/**
+ * A declaration is globally available when it lives inside a `declare global`
+ * block, or when its source file is not a module (a script file, like an
+ * ambient `.d.ts` pulled in via `types`/`typeRoots`) and it isn't scoped to an
+ * ambient module declaration like `declare module "svelte"`.
+ */
+function isGlobalDeclaration(decl: tsModule.Declaration, ts: typeof tsModule): boolean {
+  for (let node: tsModule.Node | undefined = decl.parent; node; node = node.parent) {
+    if (ts.isModuleDeclaration(node)) {
+      if (node.flags & ts.NodeFlags.GlobalAugmentation) {
+        return true;
+      }
+      if (ts.isStringLiteral(node.name)) {
+        return false;
+      }
+    }
+  }
+
+  return !ts.isExternalModule(decl.getSourceFile());
+}
+
 function resolvePackageOrModule(
-  fileName: string,
+  decl: tsModule.Declaration,
   specifier: string | undefined,
   cwd: string,
   ts: typeof tsModule,
 ): Pick<TypeReference, "package" | "module"> {
+  if (isGlobalDeclaration(decl, ts)) {
+    // The manifest schema labels globally-available symbols with this package name
+    return { package: "global:" };
+  }
   if (specifier && !ts.isExternalModuleNameRelative(specifier)) {
     return { package: specifier };
   }
-  return { module: relative(cwd, fileName) };
+  return { module: relative(cwd, decl.getSourceFile().fileName) };
 }
 
 function collectTypeReferences(
@@ -83,7 +108,7 @@ function collectTypeReferences(
           name: type.symbol.name,
           start,
           end: start + type.symbol.name.length,
-          ...resolvePackageOrModule(fileName, importSpecifiers.get(fileName), cwd, ts),
+          ...resolvePackageOrModule(decl, importSpecifiers.get(fileName), cwd, ts),
         });
       }
     }

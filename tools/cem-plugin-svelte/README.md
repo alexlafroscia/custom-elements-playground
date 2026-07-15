@@ -39,6 +39,11 @@ createSveltePlugin({
 
   // Svelte compiler options; used to ensure components are compiled with the correct options
   compilerOptions: SupportedCompilerOptions,
+
+  // Path to a tsconfig.json used to configure type resolution (for example, to pick up global
+  // types provided through `types`/`typeRoots`). Relative paths are resolved against `cwd`.
+  // Defaults to `<cwd>/tsconfig.json` when present.
+  tsconfigPath: string,
 });
 ```
 

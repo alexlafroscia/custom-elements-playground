@@ -19,6 +19,13 @@ export interface CreateSveltePluginOptions {
    * Svelte compiler options
    */
   compilerOptions?: SupportedCompilerOptions;
+
+  /**
+   * Path to a `tsconfig.json` used to configure type resolution (relative paths
+   * are resolved against `cwd`). Falls back to `<cwd>/tsconfig.json` when not
+   * provided; if neither exists, default compiler options are used.
+   */
+  tsconfigPath?: string;
 }
 
 interface SveltePluginResult {
@@ -29,10 +36,12 @@ interface SveltePluginResult {
 export function createSveltePlugin({
   cwd = process.cwd(),
   compilerOptions = {},
+  tsconfigPath,
 }: CreateSveltePluginOptions = {}): SveltePluginResult {
   const state: SveltePluginState = {
     compilerOptions,
     cwd,
+    tsconfigPath,
     parserCache: new ParserCache(),
   };
 

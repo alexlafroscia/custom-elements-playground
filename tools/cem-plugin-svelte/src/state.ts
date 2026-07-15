@@ -6,6 +6,7 @@ import type { ParserCache } from "./parser-cache.js";
 export interface SveltePluginState {
   compilerOptions: SupportedCompilerOptions;
   cwd: string;
+  tsconfigPath?: string;
   parserCache: ParserCache;
 
   checker?: tsModule.TypeChecker;

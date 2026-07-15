@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "Greeter.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Greeter",
+          "tagName": "svelte-vite",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "target",
+              "type": {
+                "text": "HTMLGreeterTargetElement",
+                "references": [
+                  {
+                    "name": "HTMLGreeterTargetElement",
+                    "package": "global:"
+                  }
+                ]
+              },
+              "description": "The element this greeter points at"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "svelte-vite",
+          "declaration": {
+            "name": "Greeter",
+            "module": "Greeter.svelte"
+          }
+        }
+      ]
+    }
+  ]
+}
