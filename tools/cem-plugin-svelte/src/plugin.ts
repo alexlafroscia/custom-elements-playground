@@ -3,6 +3,7 @@ import { parse, resolve } from "node:path";
 import type { Plugin } from "@custom-elements-manifest/analyzer";
 import * as schema from "custom-elements-manifest" with { type: "json" };
 
+import { classNameFromFileName } from "./class-name-from-file-name.js";
 import { isSvelteFileNode } from "./is-svelte-file.js";
 import type { AttributeEntry, FieldEntry, MemberEntry } from "./manifest-entries.js";
 import { mergeDocOverrides } from "./merge-doc-overrides.js";
@@ -24,7 +25,7 @@ export function createPlugin(state: SveltePluginState): Plugin {
       if (!tagName) return;
 
       const parsedFileName = parse(node.fileName);
-      const className = parsedFileName.name;
+      const className = classNameFromFileName(parsedFileName.name);
       const absolutePath = resolve(state.cwd, node.fileName);
 
       const { members: propMembers, attributes: propAttributes } = resolvePropMembers(
