@@ -1,5 +1,12 @@
 # cem-plugin-svelte
 
+## 1.2.0
+
+### Minor Changes
+
+- 1289295: Reference types imported from other packages by the module specifier they are importable
+  from, including types used in unions, type aliases, and method signatures.
+
 ## 1.1.0
 
 ### Minor Changes
