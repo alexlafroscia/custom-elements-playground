@@ -1,5 +1,3 @@
-export {};
-
 declare global {
   interface HTMLCounterElement extends HTMLElement {
     /**
@@ -17,3 +15,7 @@ declare global {
     "my-counter": HTMLCounterElement;
   }
 }
+
+type _HTMLCounterElement = HTMLCounterElement;
+
+export type { _HTMLCounterElement as HTMLCounterElement };

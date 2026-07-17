@@ -30,6 +30,7 @@ function localImportSpecifier(moduleRef: string, outputPath: string | undefined)
 
 export function cemToDts({ customElementsManifest, path: outputPath }: Options): string {
   const declarations: dom.TopLevelDeclaration[] = [];
+  const interfaceNames: string[] = [];
   const tagNameMap = dom.create.interface("HTMLElementTagNameMap");
 
   // Referenced types must be imported for the emitted declarations to resolve;
@@ -99,6 +100,7 @@ export function cemToDts({ customElementsManifest, path: outputPath }: Options):
       }
 
       declarations.push(iface);
+      interfaceNames.push(interfaceName);
       tagNameMap.members.push(
         dom.create.property(declaration.tagName, dom.create.namedTypeReference(interfaceName)),
       );
@@ -120,7 +122,19 @@ export function cemToDts({ customElementsManifest, path: outputPath }: Options):
     })
     .join("\n");
 
-  return `${imports ? `${imports}\n\n` : ""}export {};\n\ndeclare global {\n${inner}}\n`;
+  // The interfaces are also exported so they can be imported explicitly; a
+  // global cannot appear in an `export` declaration directly (TS2661), so each
+  // one is re-exported through a local alias. `export {}` keeps the file a
+  // module when there are no elements to export.
+  const exports =
+    interfaceNames.length === 0
+      ? "export {};"
+      : [
+          interfaceNames.map((name) => `type _${name} = ${name};`).join("\n"),
+          `export type { ${interfaceNames.map((name) => `_${name} as ${name}`).join(", ")} };`,
+        ].join("\n\n");
+
+  return `${imports ? `${imports}\n\n` : ""}declare global {\n${inner}}\n\n${exports}\n`;
 }
 
 function mapType(typeText: string): dom.Type {

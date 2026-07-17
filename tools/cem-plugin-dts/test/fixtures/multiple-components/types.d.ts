@@ -1,5 +1,3 @@
-export {};
-
 declare global {
   interface HTMLMyButtonElement extends HTMLElement {
     label: string;
@@ -14,3 +12,11 @@ declare global {
     "my-badge": HTMLMyBadgeElement;
   }
 }
+
+type _HTMLMyButtonElement = HTMLMyButtonElement;
+type _HTMLMyBadgeElement = HTMLMyBadgeElement;
+
+export type {
+  _HTMLMyButtonElement as HTMLMyButtonElement,
+  _HTMLMyBadgeElement as HTMLMyBadgeElement,
+};

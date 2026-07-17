@@ -1,8 +1,6 @@
 import type { Greeting, PersonOptions } from "greeting-types";
 import type { GreetingStyle } from "greeting-types/style";
 
-export {};
-
 declare global {
   interface HTMLGreeterElement extends HTMLElement {
     person: PersonOptions;
@@ -18,3 +16,7 @@ declare global {
     "svelte-vite": HTMLGreeterElement;
   }
 }
+
+type _HTMLGreeterElement = HTMLGreeterElement;
+
+export type { _HTMLGreeterElement as HTMLGreeterElement };

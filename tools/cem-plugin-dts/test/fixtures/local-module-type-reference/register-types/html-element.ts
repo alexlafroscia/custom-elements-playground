@@ -1,7 +1,5 @@
 import type { PersonOptions } from "../src/types.ts";
 
-export {};
-
 declare global {
   interface HTMLGreeterElement extends HTMLElement {
     person: PersonOptions;
@@ -15,3 +13,7 @@ declare global {
     "svelte-vite": HTMLGreeterElement;
   }
 }
+
+type _HTMLGreeterElement = HTMLGreeterElement;
+
+export type { _HTMLGreeterElement as HTMLGreeterElement };
