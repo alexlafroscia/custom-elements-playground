@@ -16,4 +16,5 @@ jobs:
       - uses: jdx/mise-action@v4
         with:
           experimental: true
-      - run: mise tasks run ...:test -o keep-order
+      - run: mise tasks run //...:playwright:install
+      - run: mise tasks run -o keep-order //...:test
