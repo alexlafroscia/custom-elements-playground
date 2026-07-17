@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "Greeter.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Greeter",
+          "tagName": "svelte-vite",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "person",
+              "type": {
+                "text": "PersonOptions",
+                "references": [
+                  {
+                    "name": "PersonOptions",
+                    "package": "greeting-types"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "style",
+              "type": {
+                "text": "GreetingStyle | undefined",
+                "references": [
+                  {
+                    "name": "GreetingStyle",
+                    "start": 0,
+                    "end": 13,
+                    "package": "greeting-types",
+                    "module": "style"
+                  }
+                ]
+              }
+            },
+            {
+              "kind": "field",
+              "name": "greeting",
+              "type": {
+                "text": "Greeting",
+                "references": [
+                  {
+                    "name": "Greeting",
+                    "package": "greeting-types"
+                  }
+                ]
+              },
+              "attribute": "greeting"
+            },
+            {
+              "kind": "method",
+              "name": "currentPerson",
+              "description": "Get the person currently being greeted",
+              "parameters": [],
+              "return": {
+                "type": {
+                  "text": "PersonOptions | undefined",
+                  "references": [
+                    {
+                      "name": "PersonOptions",
+                      "start": 0,
+                      "end": 13,
+                      "package": "greeting-types"
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "greeting",
+              "type": {
+                "text": "Greeting",
+                "references": [
+                  {
+                    "name": "Greeting",
+                    "package": "greeting-types"
+                  }
+                ]
+              },
+              "fieldName": "greeting"
+            }
+          ]
+        },
+        {
+          "kind": "variable",
+          "name": "Greeter__SvelteComponent_"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "svelte-vite",
+          "declaration": {
+            "name": "Greeter",
+            "module": "Greeter.svelte"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "default",
+          "declaration": {
+            "name": "Greeter__SvelteComponent_",
+            "module": "Greeter.svelte"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "Greeter.svelte",
+      "path": "src/Greeter.svelte",
       "declarations": [
         {
           "kind": "class",
@@ -17,17 +17,34 @@
           "members": [
             {
               "kind": "field",
-              "name": "children",
+              "name": "person",
               "type": {
-                "text": "Snippet<[]>",
+                "text": "PersonOptions",
                 "references": [
                   {
-                    "name": "Snippet",
-                    "start": 0,
-                    "end": 7,
-                    "package": "svelte"
+                    "name": "PersonOptions",
+                    "module": "src/types.ts"
                   }
                 ]
+              }
+            },
+            {
+              "kind": "method",
+              "name": "currentPerson",
+              "description": "Get the person currently being greeted",
+              "parameters": [],
+              "return": {
+                "type": {
+                  "text": "PersonOptions | undefined",
+                  "references": [
+                    {
+                      "name": "PersonOptions",
+                      "start": 0,
+                      "end": 13,
+                      "module": "src/types.ts"
+                    }
+                  ]
+                }
               }
             }
           ]
@@ -43,7 +60,7 @@
           "name": "svelte-vite",
           "declaration": {
             "name": "Greeter",
-            "module": "Greeter.svelte"
+            "module": "src/Greeter.svelte"
           }
         },
         {
@@ -51,7 +68,7 @@
           "name": "default",
           "declaration": {
             "name": "Greeter__SvelteComponent_",
-            "module": "Greeter.svelte"
+            "module": "src/Greeter.svelte"
           }
         }
       ]

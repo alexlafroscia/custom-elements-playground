@@ -34,10 +34,7 @@ export function createPlugin(state: SveltePluginState): Plugin {
         ts,
       );
 
-      const methodMembers =
-        state.checker && state.program
-          ? resolveMethods(absolutePath, state.program, state.checker, ts)
-          : [];
+      const methodMembers = resolveMethods(absolutePath, state, ts);
 
       const baseClassMembers = resolveBaseClassMembers(absolutePath, parserCache);
 

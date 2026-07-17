@@ -53,15 +53,13 @@ declare global {
 }
 ```
 
-The emitted file is a module (`export {}`) so it can be explicitly imported library's entry point:
+Note that the `.d.ts` file is designed to be emitted into your `src` directory, where it will be
+imported by another source file to included in your library's output:
 
 ```typescript
 // src/index.ts
 import "./components.d.ts;
 ```
-
-When a consumer imports your library library, TypeScript will follow the import chain and picks up
-the `HTMLElementTagNameMap` augmentations automatically — no extra configuration required.
 
 Multiple elements in the same manifest are all merged into a single `HTMLElementTagNameMap`
 declaration in one file.

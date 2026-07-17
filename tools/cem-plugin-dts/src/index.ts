@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { parse, resolve } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { parse, relative, resolve, sep } from "node:path";
 
 import type { Plugin } from "@custom-elements-manifest/analyzer";
 
@@ -25,14 +25,15 @@ export function dts(options: Options): Plugin {
     name: "cem-plugin-dts",
 
     packageLinkPhase({ customElementsManifest, ts }) {
-      const dts = cemToDts({ customElementsManifest });
+      const dts = cemToDts({
+        customElementsManifest,
+        // Normalized to a posix path relative to `cwd`, the root the
+        // manifest's module paths are relative to
+        path: relative(cwd, outFilePath).split(sep).join("/"),
+      });
 
       const { dir: outputDir } = parse(outFilePath);
-
-      if (!existsSync(outputDir)) {
-        mkdirSync(outputDir);
-        console.log(`Directory ${outputDir} created`);
-      }
+      mkdirSync(outputDir, { recursive: true });
 
       writeFileSync(outFilePath, dts);
     },

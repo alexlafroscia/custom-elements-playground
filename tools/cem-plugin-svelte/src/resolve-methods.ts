@@ -1,6 +1,9 @@
 import type tsModule from "@cem-analyzer-dep/typescript";
+import type * as schema from "custom-elements-manifest";
 
 import type { MethodEntry } from "./manifest-entries.js";
+import type { SveltePluginState } from "./state.js";
+import { buildImportAttribution, buildTypeReferences } from "./type-references.js";
 
 function getExportedMethodNames(
   sourceFile: tsModule.SourceFile,
@@ -26,15 +29,29 @@ function getExportedMethodNames(
 
 export function resolveMethods(
   absoluteSveltePath: string,
-  program: tsModule.Program,
-  checker: tsModule.TypeChecker,
+  state: SveltePluginState,
   ts: typeof tsModule,
 ): MethodEntry[] {
+  const { program, cwd } = state;
+  if (!program || !state.checker) return [];
+  const checker = state.checker;
+
   const sourceFile = program.getSourceFile(absoluteSveltePath + ".tsx");
   if (!sourceFile) return [];
 
   const exportedNames = getExportedMethodNames(sourceFile, ts, checker);
   if (exportedNames.size === 0) return [];
+
+  const imports = buildImportAttribution(sourceFile, checker, ts);
+
+  function toManifestType(
+    type: tsModule.Type,
+    typeNode: tsModule.TypeNode | undefined,
+  ): schema.Type {
+    const text = checker.typeToString(type);
+    const references = buildTypeReferences(type, typeNode, text, cwd, imports, checker, ts);
+    return references.length > 0 ? { text, references } : { text };
+  }
 
   const methods: MethodEntry[] = [];
 
@@ -51,10 +68,15 @@ export function resolveMethods(
           : undefined;
 
       const signature = checker.getSignatureFromDeclaration(node);
-      const parameters = (signature?.parameters ?? []).map((param) => ({
-        name: param.name,
-        type: { text: checker.typeToString(checker.getTypeOfSymbol(param)) },
-      }));
+      const parameters = (signature?.parameters ?? []).map((param) => {
+        const declaration = param.valueDeclaration;
+        const declaredTypeNode =
+          declaration && ts.isParameter(declaration) ? declaration.type : undefined;
+        return {
+          name: param.name,
+          type: toManifestType(checker.getTypeOfSymbol(param), declaredTypeNode),
+        };
+      });
 
       methods.push({
         kind: "method",
@@ -62,9 +84,7 @@ export function resolveMethods(
         ...(description ? { description } : {}),
         parameters,
         return: {
-          type: {
-            text: checker.typeToString(signature?.getReturnType() ?? checker.getVoidType()),
-          },
+          type: toManifestType(signature?.getReturnType() ?? checker.getVoidType(), node.type),
         },
       });
     }

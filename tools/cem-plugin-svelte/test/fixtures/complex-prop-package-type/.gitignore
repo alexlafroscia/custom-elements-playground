@@ -1,0 +1,4 @@
+# This fixture vendors a fake package so type resolution from `node_modules` can be tested;
+# the package's `dist` directory holds its type declarations, matching a real published layout
+!node_modules/
+!dist/

@@ -1,12 +1,9 @@
-import { relative } from "node:path";
-
 import type tsModule from "@cem-analyzer-dep/typescript";
 import type * as schema from "custom-elements-manifest";
 
 import type { AttributeEntry, FieldEntry } from "./manifest-entries.js";
 import type { SveltePluginState } from "./state.js";
-
-type TypeReference = schema.TypeReference;
+import { buildImportAttribution, buildTypeReferences } from "./type-references.js";
 
 export interface ResolvedProps {
   members: FieldEntry[];
@@ -33,97 +30,6 @@ function findPropsCallTypeNode(
   return walk(sourceFile);
 }
 
-function buildImportSpecifierMap(
-  sourceFile: tsModule.SourceFile,
-  checker: tsModule.TypeChecker,
-  ts: typeof tsModule,
-): Map<string, string> {
-  const map = new Map<string, string>();
-  for (const stmt of sourceFile.statements) {
-    if (ts.isImportDeclaration(stmt) && ts.isStringLiteral(stmt.moduleSpecifier)) {
-      const specifier = stmt.moduleSpecifier.text;
-      const moduleSymbol = checker.getSymbolAtLocation(stmt.moduleSpecifier);
-      const moduleFile = moduleSymbol?.declarations?.[0]?.getSourceFile().fileName;
-      if (moduleFile) {
-        map.set(moduleFile, specifier);
-      }
-    }
-  }
-  return map;
-}
-
-/**
- * A declaration is globally available when it lives inside a `declare global`
- * block, or when its source file is not a module (a script file, like an
- * ambient `.d.ts` pulled in via `types`/`typeRoots`) and it isn't scoped to an
- * ambient module declaration like `declare module "svelte"`.
- */
-function isGlobalDeclaration(decl: tsModule.Declaration, ts: typeof tsModule): boolean {
-  for (let node: tsModule.Node | undefined = decl.parent; node; node = node.parent) {
-    if (ts.isModuleDeclaration(node)) {
-      if (node.flags & ts.NodeFlags.GlobalAugmentation) {
-        return true;
-      }
-      if (ts.isStringLiteral(node.name)) {
-        return false;
-      }
-    }
-  }
-
-  return !ts.isExternalModule(decl.getSourceFile());
-}
-
-function resolvePackageOrModule(
-  decl: tsModule.Declaration,
-  specifier: string | undefined,
-  cwd: string,
-  ts: typeof tsModule,
-): Pick<TypeReference, "package" | "module"> {
-  if (isGlobalDeclaration(decl, ts)) {
-    // The manifest schema labels globally-available symbols with this package name
-    return { package: "global:" };
-  }
-  if (specifier && !ts.isExternalModuleNameRelative(specifier)) {
-    return { package: specifier };
-  }
-  return { module: relative(cwd, decl.getSourceFile().fileName) };
-}
-
-function collectTypeReferences(
-  type: tsModule.Type,
-  typeText: string,
-  cwd: string,
-  importSpecifiers: Map<string, string>,
-  checker: tsModule.TypeChecker,
-  ts: typeof tsModule,
-  results: TypeReference[],
-): void {
-  if (type.symbol) {
-    const decl = type.symbol.declarations?.[0];
-    if (decl) {
-      const start = typeText.indexOf(type.symbol.name);
-      if (start !== -1) {
-        const fileName = decl.getSourceFile().fileName;
-        results.push({
-          name: type.symbol.name,
-          start,
-          end: start + type.symbol.name.length,
-          ...resolvePackageOrModule(decl, importSpecifiers.get(fileName), cwd, ts),
-        });
-      }
-    }
-  }
-
-  if (type.flags & ts.TypeFlags.Object) {
-    const objectType = type as tsModule.ObjectType;
-    if (objectType.objectFlags & ts.ObjectFlags.Reference) {
-      for (const arg of checker.getTypeArguments(type as tsModule.TypeReference)) {
-        collectTypeReferences(arg, typeText, cwd, importSpecifiers, checker, ts, results);
-      }
-    }
-  }
-}
-
 function isUnionType(type: tsModule.Type, ts: typeof tsModule): type is tsModule.UnionType {
   return !!(type.flags & ts.TypeFlags.Union);
 }
@@ -143,22 +49,6 @@ function isPrimitiveType(type: tsModule.Type, ts: typeof tsModule): boolean {
       ts.TypeFlags.Null |
       ts.TypeFlags.Undefined)
   );
-}
-
-function buildTypeReferences(
-  propType: tsModule.Type,
-  typeText: string,
-  cwd: string,
-  importSpecifiers: Map<string, string>,
-  checker: tsModule.TypeChecker,
-  ts: typeof tsModule,
-): TypeReference[] {
-  const results: TypeReference[] = [];
-  collectTypeReferences(propType, typeText, cwd, importSpecifiers, checker, ts, results);
-  if (results.length <= 1) {
-    return results.map(({ start: _start, end: _end, ...ref }) => ref);
-  }
-  return results;
 }
 
 /**
@@ -182,7 +72,7 @@ export function resolvePropMembers(
 
   const type = checker.getTypeFromTypeNode(typeNode);
   const properties = checker.getPropertiesOfType(type);
-  const importSpecifiers = buildImportSpecifierMap(sourceFile, checker, ts);
+  const imports = buildImportAttribution(sourceFile, checker, ts);
 
   const members: FieldEntry[] = [];
   const attributes: AttributeEntry[] = [];
@@ -198,8 +88,20 @@ export function resolvePropMembers(
             .trim()
         : undefined;
 
+    const declaration = symbol.declarations?.[0];
+    const declaredTypeNode =
+      declaration && ts.isPropertySignature(declaration) ? declaration.type : undefined;
+
     const text = checker.typeToString(propType);
-    const references = buildTypeReferences(propType, text, cwd, importSpecifiers, checker, ts);
+    const references = buildTypeReferences(
+      propType,
+      declaredTypeNode,
+      text,
+      cwd,
+      imports,
+      checker,
+      ts,
+    );
     const propManifestType: schema.Type = references.length > 0 ? { text, references } : { text };
     const attributeEligible = isPrimitiveType(propType, ts);
 

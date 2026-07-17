@@ -27,7 +27,17 @@
               "description": "Find the currently-highlighted element",
               "parameters": [],
               "return": {
-                "type": { "text": "HTMLElement | undefined" }
+                "type": {
+                  "text": "HTMLElement | undefined",
+                  "references": [
+                    {
+                      "name": "HTMLElement",
+                      "start": 0,
+                      "end": 11,
+                      "package": "global:"
+                    }
+                  ]
+                }
               }
             }
           ],

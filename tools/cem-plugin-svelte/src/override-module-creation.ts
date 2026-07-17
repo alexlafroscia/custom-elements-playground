@@ -19,8 +19,15 @@ function loadTsCompilerOptions(
 ): tsModule.CompilerOptions {
   // Without `strictNullChecks` the checker erases `undefined` from unions, so
   // types like `HTMLElement | undefined` would be reported as `HTMLElement`.
-  // A tsconfig that explicitly disables it takes precedence.
-  const defaultOptions: tsModule.CompilerOptions = { strict: false, strictNullChecks: true };
+  // Bundler module resolution is required for packages that only expose their
+  // types through a package.json `exports` map. A tsconfig that explicitly
+  // sets any of these takes precedence.
+  const defaultOptions: tsModule.CompilerOptions = {
+    strict: false,
+    strictNullChecks: true,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+  };
 
   const configPath = state.tsconfigPath
     ? resolve(state.cwd, state.tsconfigPath)
