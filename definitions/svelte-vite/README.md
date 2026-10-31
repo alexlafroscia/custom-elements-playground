@@ -96,8 +96,9 @@ Svelte markup doesn't consult `HTMLElementTagNameMap`; without further declarati
 element used in a `.svelte` file accepts any attribute with a value of any type.
 [`cem-plugin-svelte-dts`](../../tools/cem-plugin-svelte-dts/README.md) is another CEM plugin, which
 writes `register-types/svelte-elements.d.ts`. It augments Svelte's `SvelteHTMLElements` so that each
-element accepts its properties, typed by its `HTMLElementTagNameMap` entry, alongside the attributes
-and event handlers Svelte accepts on every HTML element:
+element accepts its properties, typed by its `HTMLElementTagNameMap` entry, and handlers for the
+events it documents with `@fires`, alongside the attributes and event handlers Svelte accepts on
+every HTML element:
 
 ```ts
 import type {} from "svelte/elements";
@@ -109,7 +110,14 @@ declare module "svelte/elements" {
     "mutable-state": HTMLAttributes<HTMLElementTagNameMap["mutable-state"]> &
       Partial<Pick<HTMLElementTagNameMap["mutable-state"], "expose">>;
     "svelte-vite": HTMLAttributes<HTMLElementTagNameMap["svelte-vite"]> &
-      Partial<Pick<HTMLElementTagNameMap["svelte-vite"], "name">>;
+      Partial<Pick<HTMLElementTagNameMap["svelte-vite"], "name">> & {
+        /** Dispatched with the name being greeted when the greet button is clicked */
+        ongreet?: (
+          event: CustomEvent<string> & {
+            currentTarget: EventTarget & HTMLElementTagNameMap["svelte-vite"];
+          },
+        ) => any;
+      };
   }
 }
 ```

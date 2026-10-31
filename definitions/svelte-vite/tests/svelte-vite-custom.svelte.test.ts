@@ -54,3 +54,28 @@ describe("`getName` method", () => {
     await expect.poll(() => element.getName()).toEqual("Friend");
   });
 });
+
+describe("`greet` event", () => {
+  test("is dispatched with the current value", async () => {
+    let value = $state("World");
+    const greeted: string[] = [];
+
+    const screen = await render(
+      () =>
+        html`<svelte-vite
+          .name=${value}
+          @greet=${(event: CustomEvent<string>) => greeted.push(event.detail)}
+        ></svelte-vite>`,
+    );
+
+    await screen.getByRole("button", { name: "Greet" }).click();
+
+    expect(greeted).toEqual(["World"]);
+
+    value = "Friend";
+    await expect.element(screen.getByRole("paragraph")).toHaveTextContent(`Hello, ${value}`);
+    await screen.getByRole("button", { name: "Greet" }).click();
+
+    expect(greeted).toEqual(["World", "Friend"]);
+  });
+});

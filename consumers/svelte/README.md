@@ -40,6 +40,21 @@ With the reference in place, `svelte-check` validates each prop against the elem
 <svelte-vite nmae="World"></svelte-vite>
 ```
 
+Events the element documents get typed handlers too. `<svelte-vite>` dispatches a `greet` event,
+documented with `@fires {CustomEvent<string>} greet`, so its handler receives a
+`CustomEvent<string>`:
+
+```svelte
+<svelte-vite {name} ongreet={(event) => (greeted = [...greeted, event.detail])}></svelte-vite>
+
+<!-- Error: Type 'string' is not assignable to type 'number'. -->
+<svelte-vite ongreet={(event: CustomEvent<number>) => event.detail.toFixed()}></svelte-vite>
+```
+
+Svelte listens for the event named by the rest of an `on` attribute case-sensitively, so a handler
+with the wrong case, like `onGreet`, is reported as an unknown prop rather than silently never being
+called.
+
 ## Testing the types
 
 Svelte markup has no equivalent of `// @ts-expect-error`, so the errors above can't be asserted
