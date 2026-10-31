@@ -63,11 +63,11 @@ export function cemToSvelteDts({ customElementsManifest, imports = [] }: Options
     }
   }
 
-  // Within the augmentation, `HTMLAttributes` resolves to the export of
-  // `svelte/elements` itself, so it needs no import of its own
+  // The import loads the module augmented below, and makes this file a module,
+  // as augmenting requires; within the augmentation, `HTMLAttributes`
+  // resolves to the export of `svelte/elements` itself, so it needs no import
+  // of its own
   return [
-    "// Loads the module augmented below, which also makes this file a module, as",
-    "// augmenting requires",
     'import type {} from "svelte/elements";',
     ...imports.map((specifier) => `import type {} from ${JSON.stringify(specifier)};`),
     "",

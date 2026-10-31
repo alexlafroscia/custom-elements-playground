@@ -50,8 +50,6 @@ svelteDts({
 Given a manifest documenting a `simple-greeter` element with a `name` property, the plugin writes:
 
 ```ts
-// Loads the module augmented below, which also makes this file a module, as
-// augmenting requires
 import type {} from "svelte/elements";
 
 declare module "svelte/elements" {
