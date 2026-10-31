@@ -19,7 +19,7 @@
     "cem-plugin-svelte": "workspace:*",
     "custom-element-vs-code-integration": "^1.5.0",
     "lit": "^3.3.3",
-    "playwright": "1.60.0",
+    "playwright": "catalog:",
     "svelte": "^5.55.5",
     "svelte-check": "^4.4.8",
     "typescript": "~6.0.2",

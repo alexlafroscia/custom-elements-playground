@@ -24,15 +24,4 @@ depends = ["build"]
 [tasks."test:browser"]
 description = "Run tests in-browser"
 run = "pnpm exec vitest"
-depends = ["playwright:install"]
-
-[tasks."playwright:install"]
-description = "Install playwright browser dependencies"
-run = """
-if [ "$CI" = "true" ]; then
-  pnpm exec playwright install chromium-headless-shell --with-deps
-else
-  pnpm exec playwright install chromium --with-deps
-fi
-"""
-hide = true
+depends = ["//:playwright:install"]

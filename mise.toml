@@ -29,6 +29,22 @@ run = "pnpm exec oxfmt --check"
 description = "Check formatting on all files"
 run = [{ task = "format:check" }]
 
+[tasks."playwright:install"]
+description = "Install playwright browsers"
+run = """
+if [ "$CI" = "true" ]; then
+  pnpm exec playwright install chromium-headless-shell
+else
+  pnpm exec playwright install chromium
+fi
+"""
+hide = true
+
+[tasks."playwright:install-deps"]
+description = "Install system dependencies for playwright browsers"
+run = "pnpm exec playwright install-deps chromium"
+hide = true
+
 [tasks."husky:pre-commit"]
 description = "Called by `husky` on pre-commit"
 run = "pnpm exec lint-staged"

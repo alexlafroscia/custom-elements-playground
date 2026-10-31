@@ -4,3 +4,5 @@ packages:
   - "tools/*"
 allowBuilds:
   rs-module-lexer: true
+catalog:
+  playwright: 1.60.0
