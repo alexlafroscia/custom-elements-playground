@@ -1,5 +1,5 @@
-// Registers the element from the `member-filtering` fixture, as a library
-// would for the generated types to read its props from
+// Registers this fixture's elements, as a library would for the generated
+// types to read their props from
 declare global {
   interface HTMLCounterElement extends HTMLElement {
     /** The current count */
