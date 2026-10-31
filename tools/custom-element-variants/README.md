@@ -21,7 +21,6 @@ import { createVariantElement } from "custom-element-variants";
 import { describeVariant } from "custom-element-variants/manifest";
 
 import manifest from "../custom-elements.json";
-
 // Variant elements must still be defined; importing their modules does so
 import "./action-button.ts";
 import "./link-button.ts";
