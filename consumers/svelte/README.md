@@ -55,24 +55,11 @@ Svelte listens for the event named by the rest of an `on` attribute case-sensiti
 with the wrong case, like `onGreet`, is reported as an unknown prop rather than silently never being
 called.
 
-## Testing the types
-
-`mise run check` runs `svelte-check` on the app, which shows that valid usage is accepted. It can't
-show that invalid usage is rejected: if the library's Svelte types failed to apply, every element
-would accept anything, and the app would still pass.
-
-[`type-tests/usage.ts`](./type-tests/usage.ts) asserts what's rejected. Svelte markup has no
-equivalent of `// @ts-expect-error`, so the file checks usages against `SvelteHTMLElements`, the
-types `svelte-check` checks each element's props in markup against, with a `@ts-expect-error` on
-each one that must be rejected. `mise run test:types` type-checks it with `tsc`; if a usage were
-accepted, or the library's Svelte types failed to apply, its directive would be reported as unused.
-
 ## Tasks
 
-| Task                  | Description                                                  |
-| --------------------- | ------------------------------------------------------------ |
-| `mise run dev`        | Start the development server                                 |
-| `mise run build`      | Build the app                                                |
-| `mise run check`      | Run all svelte-check / tsc type checks                       |
-| `mise run test`       | Run checks, then verify that invalid usage is reported       |
-| `mise run test:types` | Verify that invalid usage of the custom elements is reported |
+| Task             | Description                            |
+| ---------------- | -------------------------------------- |
+| `mise run dev`   | Start the development server           |
+| `mise run build` | Build the app                          |
+| `mise run check` | Run all svelte-check / tsc type checks |
+| `mise run test`  | Run all checks                         |

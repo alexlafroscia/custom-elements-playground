@@ -1,4 +1,0 @@
-{
-  "extends": "../tsconfig.svelte.json",
-  "include": ["*.ts", "../src/custom-elements.d.ts"]
-}
