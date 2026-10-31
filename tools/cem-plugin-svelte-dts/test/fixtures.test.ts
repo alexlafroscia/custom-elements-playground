@@ -6,7 +6,6 @@ import { test } from "node:test";
 import * as url from "node:url";
 
 import type { PackageLinkPhaseParams } from "@custom-elements-manifest/analyzer";
-import * as ts from "typescript";
 
 import { svelteDts } from "../dist/index.js";
 import { normalizeTypeScript } from "./test-helpers.ts";
@@ -35,13 +34,10 @@ for (const fixture of fixtures) {
 
     try {
       const plugin = svelteDts({ ...options, path: outputPath, cwd: outputRoot });
-      plugin.packageLinkPhase?.({
-        // The analyzer types `ts` against its own TypeScript version, which
-        // lags the one installed here; this plugin never uses it
-        ts: ts as unknown as PackageLinkPhaseParams["ts"],
-        customElementsManifest,
-        context: {},
-      });
+      // Called with the same parameters the analyzer passes. Its types declare
+      // `PackageLinkPhaseParams` twice, and the merged interface wrongly
+      // requires a `ts` parameter, which the analyzer never passes to this phase
+      plugin.packageLinkPhase?.({ customElementsManifest, context: {} } as PackageLinkPhaseParams);
 
       const generated = await fs.readFile(path.resolve(outputRoot, outputPath), {
         encoding: "utf-8",
