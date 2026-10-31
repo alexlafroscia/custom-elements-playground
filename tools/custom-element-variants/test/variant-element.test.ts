@@ -278,6 +278,124 @@ describe("slots", () => {
   });
 });
 
+class SizedElement extends HTMLElement {
+  connectedCallback() {
+    const root = this.shadowRoot ?? this.attachShadow({ mode: "open" });
+    root.innerHTML = `<style>:host { display: block; width: 50px; height: 20px; }</style>`;
+  }
+}
+
+customElements.define("test-sized", SizedElement);
+customElements.define("test-sized-variant", createVariantElement({ sized: SizedElement }));
+
+function rectOf(element: Element) {
+  const { left, top, width, height } = element.getBoundingClientRect();
+  return { left, top, width, height };
+}
+
+describe("layout", () => {
+  test("the wrapper does not generate a box", () => {
+    const { host, child } = renderAlpha();
+
+    expect(getComputedStyle(host).display).toBe("contents");
+    expect(host.getClientRects()).toHaveLength(0);
+    expect(childOf(host)).toBe(child);
+  });
+
+  test("the child is the item of a flex container", () => {
+    const screen = render(html`
+      <div data-testid="container" style="display: flex; width: 300px;">
+        <div style="width: 100px;"></div>
+        <test-sized-variant variant="sized" style="flex: 1;"></test-sized-variant>
+      </div>
+    `);
+    const host = screen.container.querySelector("test-sized-variant")!;
+
+    expect(rectOf(childOf(host)).width).toBe(200);
+  });
+
+  test("the child is the item of a grid container", () => {
+    const screen = render(html`
+      <div style="display: grid; grid-template-areas: 'a b'; grid-template-columns: 100px 100px;">
+        <test-sized-variant variant="sized" style="grid-area: b;"></test-sized-variant>
+      </div>
+    `);
+    const container = screen.container.firstElementChild!;
+    const host = screen.container.querySelector("test-sized-variant")!;
+
+    expect(rectOf(childOf(host)).left - rectOf(container).left).toBe(100);
+  });
+
+  test("`order` on the wrapper reorders the child", () => {
+    const screen = render(html`
+      <div style="display: flex;">
+        <test-sized-variant variant="sized" id="first"></test-sized-variant>
+        <test-sized-variant variant="sized" id="second" style="order: -1;"></test-sized-variant>
+      </div>
+    `);
+    const first = childOf(screen.container.querySelector("#first")!);
+    const second = childOf(screen.container.querySelector("#second")!);
+
+    expect(rectOf(second).left).toBeLessThan(rectOf(first).left);
+  });
+
+  test("`align-self` on the wrapper aligns the child", () => {
+    const screen = render(html`
+      <div style="display: flex; align-items: flex-start; height: 100px;">
+        <test-sized-variant variant="sized" style="align-self: flex-end;"></test-sized-variant>
+      </div>
+    `);
+    const container = screen.container.firstElementChild!;
+    const host = screen.container.querySelector("test-sized-variant")!;
+
+    expect(rectOf(childOf(host)).top - rectOf(container).top).toBe(80);
+  });
+
+  test("`margin` on the wrapper is applied to the child", () => {
+    const screen = render(html`
+      <div style="display: flex;">
+        <test-sized-variant variant="sized" style="margin-left: 20px;"></test-sized-variant>
+      </div>
+    `);
+    const container = screen.container.firstElementChild!;
+    const host = screen.container.querySelector("test-sized-variant")!;
+
+    expect(rectOf(childOf(host)).left - rectOf(container).left).toBe(20);
+  });
+
+  test("the child's own sizing is not overridden by the wrapper", () => {
+    const screen = render(html`<test-sized-variant variant="sized"></test-sized-variant>`);
+    const host = screen.container.querySelector("test-sized-variant")!;
+
+    expect(rectOf(childOf(host))).toMatchObject({ width: 50, height: 20 });
+  });
+
+  test("the child can be sized through the `variant` part", () => {
+    const screen = render(html`
+      <style>
+        .wide::part(variant) {
+          width: 120px;
+        }
+      </style>
+      <test-sized-variant class="wide" variant="sized"></test-sized-variant>
+    `);
+    const host = screen.container.querySelector("test-sized-variant")!;
+
+    expect(rectOf(childOf(host)).width).toBe(120);
+  });
+
+  test("the `hidden` attribute hides the child", () => {
+    const screen = render(html`<test-sized-variant variant="sized" hidden></test-sized-variant>`);
+    const host = screen.container.querySelector<HTMLElement>("test-sized-variant")!;
+
+    expect(childOf(host).checkVisibility()).toBe(false);
+
+    host.hidden = false;
+
+    expect(childOf(host).checkVisibility()).toBe(true);
+  });
+});
+
 test("the instance type is discriminated on `variant`", () => {
   expectTypeOf<TestVariantElement>().toEqualTypeOf<VariantElement<typeof TestVariant.variants>>();
   expectTypeOf<TestVariantElement["variant"]>().toEqualTypeOf<"alpha" | "beta">();

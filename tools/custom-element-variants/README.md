@@ -78,6 +78,35 @@ The variant element is rendered within the wrapper's shadow root. The wrapper it
 | Slots      | Default and named slots are forwarded to the variant  |                                                       |
 | Focus      | Delegated to the variant (`delegatesFocus`)           |                                                       |
 
+### Styles
+
+Because the wrapper generates no box of its own, the variant element takes its place in the layout;
+within a flex or grid container, for example, the variant element is the flex or grid item.
+
+Properties that place an element within its parent would have no effect on the wrapper, so the
+variant element inherits them from it instead. Setting any of these on the wrapper applies them to
+the variant element:
+
+- `flex`
+- `order`
+- `align-self` and `justify-self`
+- `grid-area`
+- `margin`
+
+These take precedence over the variant element's own `:host` styles for the same properties.
+
+Sizing properties, such as `width` and `height`, are not inherited, so that the variant element's
+own sizing is preserved. The variant element is exposed as the `variant` part, which can be used to
+style it directly:
+
+```css
+my-button::part(variant) {
+  width: 100%;
+}
+```
+
+The `hidden` attribute hides the wrapper and the variant element along with it.
+
 ### Properties and methods
 
 When the wrapper is defined, the prototype chain of each variant (up to `HTMLElement.prototype`) is
@@ -121,6 +150,6 @@ element; calling `preventDefault()` on the re-dispatched event cancels the origi
   not reflected to the wrapper.
 - Re-dispatched events are constructed with `new event.constructor(event.type, event)`, which may
   not work for `Event` subclasses with a different constructor signature.
-- Because the wrapper uses `display: contents`, sizing and spacing applied to the wrapper itself
-  have no effect.
+- Because the wrapper uses `display: contents`, styles that apply to its box (such as `width`,
+  `padding`, `border`, or `background`) have no effect; style the `variant` part instead.
 - Form-associated variant elements are not supported.

@@ -27,6 +27,28 @@ const SKIPPED_MEMBERS = new Set<PropertyKey>([
   "attributeChangedCallback",
 ]);
 
+/**
+ * The wrapper generates no box of its own, so that the variant element takes its place in the
+ * layout. Properties that place the wrapper within its parent would otherwise be ignored; the
+ * variant inherits them so that they apply to it instead.
+ *
+ * Sizing properties are deliberately not inherited, as the variant's own `:host` styles would
+ * always be overridden by the wrapper's defaults.
+ */
+const HOST_STYLES = `
+  :host { display: contents; }
+  :host([hidden]) { display: none; }
+
+  :host > * {
+    flex: inherit;
+    order: inherit;
+    align-self: inherit;
+    justify-self: inherit;
+    grid-area: inherit;
+    margin: inherit;
+  }
+`;
+
 let hostStyles: CSSStyleSheet | undefined;
 
 /**
@@ -110,7 +132,7 @@ export function createVariantElement<const M extends Variants>(
       members = collectMembers(variants);
       if (!hostStyles) {
         hostStyles = new CSSStyleSheet();
-        hostStyles.replaceSync(":host { display: contents; }");
+        hostStyles.replaceSync(HOST_STYLES);
       }
 
       for (const [key, kind] of members) {
@@ -207,6 +229,7 @@ export function createVariantElement<const M extends Variants>(
 
       this.#variant = value;
       const child = new Ctor() as HTMLElement & Record<PropertyKey, unknown>;
+      child.part.add("variant");
 
       const attributes = observedAttributesOf(Ctor).filter((attribute) => attribute !== "variant");
 
