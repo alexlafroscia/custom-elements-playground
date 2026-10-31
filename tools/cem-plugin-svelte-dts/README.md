@@ -68,6 +68,40 @@ Each element accepts:
   name, so each public, writable instance field documented in the manifest is accepted. Static,
   readonly, private, and protected fields, and methods, are not. Props are optional, as a custom
   element can't require that a property be set.
+- A handler for each event documented in the manifest
+
+## Events
+
+Svelte 5 listens for an event with an `on` attribute, taking the rest of the attribute's name as the
+event's name, verbatim and case-sensitively. Each event documented in the manifest therefore gets a
+handler prop named `on` followed by its exact name:
+
+| Event          | Handler in markup          |
+| -------------- | -------------------------- |
+| `greet`        | `ongreet={handler}`        |
+| `valueChange`  | `onvalueChange={handler}`  |
+| `name-cleared` | `onname-cleared={handler}` |
+
+Handlers are typed as Svelte types those of built-in events: they receive the event's documented
+type, with its `currentTarget` being the element. Given a manifest documenting a `simple-greeter`
+element that dispatches a `greet` event of type `CustomEvent<string>`, the plugin writes:
+
+```ts
+"simple-greeter": HTMLAttributes<HTMLElementTagNameMap["simple-greeter"]> &
+  Partial<Pick<HTMLElementTagNameMap["simple-greeter"], "name">> & {
+    /** Dispatched with the name being greeted */
+    ongreet?: (
+      event: CustomEvent<string> & {
+        currentTarget: EventTarget & HTMLElementTagNameMap["simple-greeter"];
+      },
+    ) => any;
+  };
+```
+
+An event without a documented type is typed as `Event`. Unlike props, event types can't be read from
+`HTMLElementTagNameMap`, so they're taken from the type text in the manifest, and must be types that
+are available globally, such as `CustomEvent<string>`; the generated file doesn't import types the
+text refers to.
 
 ## Element types
 

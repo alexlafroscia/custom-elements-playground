@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/Greeter.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Greeter",
+          "tagName": "my-greeter",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "greet",
+              "type": {
+                "text": "CustomEvent<string>"
+              },
+              "description": "Dispatched with the name being greeted"
+            },
+            {
+              "name": "valueChange",
+              "type": {
+                "text": "CustomEvent<number>"
+              }
+            },
+            {
+              "name": "name-cleared"
+            },
+            {
+              "name": "",
+              "description": "An event without a name, which no handler can be written for"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
