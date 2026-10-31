@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/Counter.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Counter",
+          "tagName": "my-counter",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": [
+            {
+              "kind": "field",
+              "name": "count",
+              "type": {
+                "text": "number"
+              },
+              "description": "The current count"
+            },
+            {
+              "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "public"
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "instances",
+              "type": {
+                "text": "number"
+              },
+              "static": true
+            },
+            {
+              "kind": "field",
+              "name": "history",
+              "type": {
+                "text": "number[]"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "pending",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "protected"
+            },
+            {
+              "kind": "method",
+              "name": "increment",
+              "description": "Increment the counter"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
