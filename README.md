@@ -32,6 +32,7 @@ Example component libraries that demonstrate the full workflow end-to-end:
 Example apps that consume the custom elements defined in `definitions/`, with their usage validated
 by type checking:
 
-| Package                                  | Description                                                                        |
-| ---------------------------------------- | ---------------------------------------------------------------------------------- |
-| [`svelte`](./consumers/svelte/README.md) | Svelte 5 app using `svelte-vite`'s elements, with markup checked by `svelte-check` |
+| Package                                      | Description                                                                        |
+| -------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [`svelte`](./consumers/svelte/README.md)     | Svelte 5 app using `svelte-vite`'s elements, with markup checked by `svelte-check` |
+| [`react-19`](./consumers/react-19/README.md) | React 19 app using `svelte-vite`'s elements directly in JSX, checked by `tsc`      |

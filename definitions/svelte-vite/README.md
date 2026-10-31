@@ -136,6 +136,34 @@ installed; Svelte apps opt in with a type reference instead:
 See [`consumers/svelte`](../../consumers/svelte/README.md) for an app that consumes the elements
 this way.
 
+## React type definitions
+
+React 19 sets props on custom elements as properties and listens for their events through `on`
+props, so the elements can be used directly in JSX; TypeScript only needs them declared in
+`JSX.IntrinsicElements`.
+[`custom-element-jsx-integration`](https://www.npmjs.com/package/custom-element-jsx-integration)
+writes `register-types/jsx-elements.d.ts`, exporting a `CustomElements` type with each element's
+properties and an `on<event>` handler for each event it documents.
+
+Two things keep that type from being used as-is, so the hand-written
+[`types/react.d.ts`](./types/react.d.ts) registers it with React instead:
+
+- Its props are a generic JSX set rather than React's, so each element is intersected with React's
+  `HTMLAttributes`, typing `ref` as the element and allowing props like `onClick` and `aria-*`.
+- The plugin reads an event's manifest `type` as the type of its `detail`, but the
+  [schema](https://github.com/webcomponents/custom-elements-manifest/blob/main/schema.d.ts) defines
+  it as the type of the event object itself, so `greet`'s `CustomEvent<string>` is generated as
+  `CustomEvent<CustomEvent<string>>`. The extra `CustomEvent` is unwrapped.
+
+The file is published as the `./react` export, which React apps opt into with a type reference:
+
+```ts
+/// <reference types="@cem-playground/svelte-vite/react" />
+```
+
+See [`consumers/react-19`](../../consumers/react-19/README.md) for an app that consumes the elements
+this way.
+
 ## Browser testing with mutable properties
 
 The tests run in a real browser via [Vitest Browser](https://vitest.dev/guide/browser/) +
