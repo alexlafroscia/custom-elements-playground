@@ -1,0 +1,34 @@
+{
+  "name": "custom-element-variants",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./manifest": {
+      "import": "./dist/manifest.js",
+      "types": "./dist/manifest.d.ts"
+    }
+  },
+  "files": [
+    "src/",
+    "dist/"
+  ],
+  "repository": {
+    "url": "https://github.com/alexlafroscia/custom-elements-playground",
+    "directory": "tools/custom-element-variants"
+  },
+  "dependencies": {
+    "custom-elements-manifest": "^2.1.0"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "^4.1.8",
+    "lit": "^3.3.3",
+    "playwright": "catalog:",
+    "typescript": "~6.0.2",
+    "vitest": "^4.1.8",
+    "vitest-browser-lit": "^1.0.1"
+  }
+}

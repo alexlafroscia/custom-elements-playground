@@ -50,16 +50,5 @@ run = [{ task = "check" }, { task = "test:browser", args = ["--browser.headless"
 [tasks."test:browser"]
 description = "Run component tests in-browser"
 run = "pnpm exec vitest --config=vitest.browser.config.ts"
-depends = ["playwright:install"]
-
-[tasks."playwright:install"]
-description = "Install playwright browser dependencies"
-run = """
-if [ "$CI" = "true" ]; then
-  pnpm exec playwright install chromium-headless-shell --with-deps
-else
-  pnpm exec playwright install chromium --with-deps
-fi
-"""
-hide = true
+depends = ["//:playwright:install"]
 

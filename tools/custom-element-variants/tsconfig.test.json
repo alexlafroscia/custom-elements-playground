@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["vitest/browser"],
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+
+    "tsBuildInfoFile": "dist/tsconfig.test.tsbuildinfo"
+  },
+  "include": ["test", "vitest.config.ts"],
+  "references": [{ "path": "./tsconfig.src.json" }]
+}
