@@ -10,12 +10,19 @@
     },
     "./svelte": {
       "types": "./register-types/svelte-elements.d.ts"
+    },
+    "./react": {
+      "types": "./types/react.d.ts"
     }
   },
   "peerDependencies": {
+    "@types/react": "^19.0.0",
     "svelte": "^5.0.0"
   },
   "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
     "svelte": {
       "optional": true
     }
@@ -25,10 +32,12 @@
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@tsconfig/svelte": "^5.0.8",
     "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
     "@vitest/browser-playwright": "^5.0.5",
     "cem-plugin-dts": "workspace:*",
     "cem-plugin-svelte": "workspace:*",
     "cem-plugin-svelte-dts": "workspace:*",
+    "custom-element-jsx-integration": "^1.6.0",
     "custom-element-vs-code-integration": "^1.5.0",
     "lit": "^3.3.3",
     "playwright": "catalog:",

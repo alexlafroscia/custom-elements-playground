@@ -66,6 +66,15 @@ from the relevant package directory (or from the root for workspace-level tasks)
 | `mise run check` | Run all svelte-check / tsc type checks |
 | `mise run test`  | Run all checks                         |
 
+### `consumers/react-19`
+
+| Task             | Description                       |
+| ---------------- | --------------------------------- |
+| `mise run dev`   | Start the Vite development server |
+| `mise run build` | Build the app                     |
+| `mise run check` | Run all tsc type checks           |
+| `mise run test`  | Run all checks                    |
+
 ### Cross-package references
 
 `mise` supports cross-package task dependencies using the `//path/to/package:task` syntax. For
