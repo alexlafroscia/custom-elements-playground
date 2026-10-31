@@ -13,26 +13,26 @@ describe("`name` property", () => {
     let value = $state("World");
 
     const screen = await render(() => html`<svelte-vite .name=${value}></svelte-vite>`);
-    const element = screen.getByText("Hello");
+    const element = screen.getByRole("paragraph");
 
-    await expect.element(element).toHaveTextContent(value);
+    await expect.element(element).toHaveTextContent(`Hello, ${value}`);
 
     value = "Friend";
 
-    await expect.element(element).toHaveTextContent(value);
+    await expect.element(element).toHaveTextContent(`Hello, ${value}`);
   });
 
   test("setting the value as an attribute", async () => {
     let value = $state("World");
 
     const screen = await render(() => html`<svelte-vite name=${value}></svelte-vite>`);
-    const element = screen.getByText("Hello");
+    const element = screen.getByRole("paragraph");
 
-    await expect.element(element).toHaveTextContent(value);
+    await expect.element(element).toHaveTextContent(`Hello, ${value}`);
 
     value = "Friend";
 
-    await expect.element(element).toHaveTextContent(value);
+    await expect.element(element).toHaveTextContent(`Hello, ${value}`);
   });
 });
 
@@ -51,8 +51,6 @@ describe("`getName` method", () => {
 
     value = "Friend";
 
-    expect.poll(() => {
-      expect(element.getName()).toEqual("Friend");
-    });
+    await expect.poll(() => element.getName()).toEqual("Friend");
   });
 });
