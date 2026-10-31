@@ -28,14 +28,44 @@ function isProp(member: schema.ClassMember): boolean {
 }
 
 /**
+ * A property key for `name`, quoted only when it is not a valid identifier
+ */
+function propertyKey(name: string): string {
+  return /^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name);
+}
+
+/**
+ * The handler prop for each event the element dispatches
+ *
+ * Svelte listens for the event named by the rest of an `on` attribute,
+ * verbatim, so the prop for an event is `on` followed by its exact name. The
+ * handler is typed as Svelte types those of built-in events, with the event's
+ * `currentTarget` being the element; an event without a documented type is
+ * typed as `Event`.
+ */
+function eventHandlerProps(events: schema.Event[], element: string): string[] {
+  return events
+    .filter((event) => event.name)
+    .flatMap((event) => {
+      const type = event.type?.text || "Event";
+      const handler = `(event: ${type} & { currentTarget: EventTarget & ${element} }) => any`;
+
+      return [
+        ...(event.description ? [`/** ${event.description.replaceAll("*/", "*\\/")} */`] : []),
+        `${propertyKey(`on${event.name}`)}?: ${handler};`,
+      ];
+    });
+}
+
+/**
  * Generates a module augmentation of `svelte/elements` that types each custom
  * element in the manifest when used in Svelte markup.
  *
  * Each element accepts the attributes and event handlers Svelte allows on
- * every HTML element, along with its props. The type of each prop is read from
- * the element's entry in `HTMLElementTagNameMap`, so the elements must be
- * registered there. Props are optional, as a custom element cannot require
- * that a property be set.
+ * every HTML element, along with its props and handlers for the events it
+ * dispatches. The type of each prop is read from the element's entry in
+ * `HTMLElementTagNameMap`, so the elements must be registered there. Props are
+ * optional, as a custom element cannot require that a property be set.
  */
 export function cemToSvelteDts({ customElementsManifest, imports = [] }: Options): string {
   const entries: string[] = [];
@@ -59,7 +89,13 @@ export function cemToSvelteDts({ customElementsManifest, imports = [] }: Options
       const props =
         propNames.length === 0 ? "" : ` & Partial<Pick<${element}, ${propNames.join(" | ")}>>`;
 
-      entries.push(`    ${tagName}: HTMLAttributes<${element}>${props};`);
+      const handlerProps = eventHandlerProps(declaration.events ?? [], element);
+      const handlers =
+        handlerProps.length === 0
+          ? ""
+          : ` & {\n${handlerProps.map((line) => `      ${line}`).join("\n")}\n    }`;
+
+      entries.push(`    ${tagName}: HTMLAttributes<${element}>${props}${handlers};`);
     }
   }
 
