@@ -18,17 +18,17 @@
   },
   "dependencies": {
     "@cem-analyzer-dep/typescript": "npm:typescript@5.4.5",
-    "comment-parser": "^1.2.4",
-    "svelte2tsx": "^0.7.56"
+    "comment-parser": "^1.4.9",
+    "svelte2tsx": "^0.7.62"
   },
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
-    "@tsconfig/node24": "^24.0.4",
-    "@types/estree": "^1.0.9",
-    "@types/node": "^24.13.0",
+    "@tsconfig/node24": "^24.0.5",
+    "@types/estree": "^1.0.10",
+    "@types/node": "^24.19.2",
     "custom-elements-manifest": "^2.1.0",
-    "svelte": "^5.56.2",
-    "typescript": "~6.0.2"
+    "svelte": "^5.57.3",
+    "typescript": "~6.0.3"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
