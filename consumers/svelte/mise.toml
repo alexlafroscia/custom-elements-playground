@@ -21,7 +21,7 @@ depends = ["//definitions/svelte-vite:build:cem"]
 hide = true
 
 [tasks."check:node"]
-description = "Type-check configuration and test files"
+description = "Type-check configuration files"
 run = "pnpm exec tsc -p tsconfig.node.json"
 hide = true
 
@@ -31,5 +31,5 @@ run = [{ task = "check" }, { task = "test:types" }]
 
 [tasks."test:types"]
 description = "Verify that invalid usage of the custom elements is reported"
-run = "node --experimental-strip-types --test './tests/**/*.test.ts'"
+run = "pnpm exec tsc -p type-tests/tsconfig.json --noEmit"
 depends = ["//definitions/svelte-vite:build:cem"]

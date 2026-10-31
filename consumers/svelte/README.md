@@ -57,11 +57,15 @@ called.
 
 ## Testing the types
 
-Svelte markup has no equivalent of `// @ts-expect-error`, so the errors above can't be asserted
-inline. Instead, [`type-tests/InvalidUsage.svelte`](./type-tests/InvalidUsage.svelte) collects
-invalid usages, each preceded by an `@expect-error` comment naming the error it should produce, and
-[`tests/type-check.test.ts`](./tests/type-check.test.ts) runs `svelte-check` against it and asserts
-that exactly those errors are reported.
+`mise run check` runs `svelte-check` on the app, which shows that valid usage is accepted. It can't
+show that invalid usage is rejected: if the library's Svelte types failed to apply, every element
+would accept anything, and the app would still pass.
+
+[`type-tests/usage.ts`](./type-tests/usage.ts) asserts what's rejected. Svelte markup has no
+equivalent of `// @ts-expect-error`, so the file checks usages against `SvelteHTMLElements`, the
+types `svelte-check` checks each element's props in markup against, with a `@ts-expect-error` on
+each one that must be rejected. `mise run test:types` type-checks it with `tsc`; if a usage were
+accepted, or the library's Svelte types failed to apply, its directive would be reported as unused.
 
 ## Tasks
 
