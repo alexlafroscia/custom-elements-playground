@@ -1,2 +1,4 @@
 # Dependencies
 node_modules/
+# Vitest attachments (e.g. failure screenshots)
+.vitest/
