@@ -1,5 +1,11 @@
 # cem-plugin-svelte
 
+## 1.2.1
+
+### Patch Changes
+
+- 6442894: Update `comment-parser` to `^1.4.9` and `svelte2tsx` to `^0.7.62`.
+
 ## 1.2.0
 
 ### Minor Changes
