@@ -47,16 +47,12 @@ export function createPlugin(state: SveltePluginState): Plugin {
 
       const builtMembers: MemberEntry[] = [...propMembers, ...methodMembers, ...baseClassMembers];
 
-      const finalMembers = mergeDocOverrides(
-        builtMembers,
-        commentProps ?? [],
-        (o): FieldEntry => ({
-          kind: "field",
-          name: o.name,
-          ...(o.type !== undefined ? { type: o.type } : {}),
-          ...(o.description !== undefined ? { description: o.description } : {}),
-        }),
-      );
+      const finalMembers = mergeDocOverrides(builtMembers, commentProps ?? [], (o): FieldEntry => ({
+        kind: "field",
+        name: o.name,
+        ...(o.type !== undefined ? { type: o.type } : {}),
+        ...(o.description !== undefined ? { description: o.description } : {}),
+      }));
 
       const finalAttributes = mergeDocOverrides(
         propAttributes,

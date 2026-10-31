@@ -1,7 +1,11 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "ignorePatterns": [],
-  "sortImports": true,
+  "sortImports": {
+    // Treat comments between imports as group boundaries, so a comment that introduces a set of
+    // imports keeps its preceding blank line
+    "partitionByComment": true
+  },
 
   // This seems like it might have behaved differently locally vs CI
   "sortPackageJson": false,

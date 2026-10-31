@@ -13,6 +13,7 @@ extract exported methods — including types imported from other files.
 
 ```js
 import { createSveltePlugin } from "cem-plugin-svelte";
+
 import svelteConfig from "./svelte.config.js";
 
 const { plugin, overrideModuleCreation } = createSveltePlugin({
