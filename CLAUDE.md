@@ -29,6 +29,15 @@ from the relevant package directory (or from the root for workspace-level tasks)
 | `mise run test`            | Build, typecheck tests, then run unit tests |
 | `mise run typecheck:tests` | Type-check test files only                  |
 
+### `tools/custom-element-variants`
+
+| Task                       | Description                             |
+| -------------------------- | --------------------------------------- |
+| `mise run build`           | Compile TypeScript to `dist/`           |
+| `mise run test`            | Typecheck tests, then run browser tests |
+| `mise run test:browser`    | Run Vitest browser tests interactively  |
+| `mise run typecheck:tests` | Type-check test files only              |
+
 ### `definitions/svelte-vite`
 
 | Task                    | Description                                      |

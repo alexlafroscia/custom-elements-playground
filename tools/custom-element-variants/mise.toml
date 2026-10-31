@@ -1,0 +1,38 @@
+[tasks.build]
+description = "Build library and types"
+run = "pnpm exec tsc -p tsconfig.src.json"
+sources = ["src/**/*", "tsconfig.src.json"]
+outputs = ["dist/**/*"]
+
+[tasks.test]
+description = "Run type checks and browser tests (headless)"
+run = [
+  { task = "typecheck:tests" },
+  { task = "test:browser", args = [
+    "--browser.headless",
+    "--run",
+  ] },
+]
+
+[tasks."typecheck:tests"]
+description = "Type-check the tests"
+run = "pnpm exec tsc -p tsconfig.test.json --noEmit"
+sources = ["test/**/*", "vitest.config.ts", "tsconfig.test.json"]
+outputs = ["dist/tsconfig.test.tsbuildinfo"]
+depends = ["build"]
+
+[tasks."test:browser"]
+description = "Run tests in-browser"
+run = "pnpm exec vitest"
+depends = ["playwright:install"]
+
+[tasks."playwright:install"]
+description = "Install playwright browser dependencies"
+run = """
+if [ "$CI" = "true" ]; then
+  pnpm exec playwright install chromium-headless-shell --with-deps
+else
+  pnpm exec playwright install chromium --with-deps
+fi
+"""
+hide = true

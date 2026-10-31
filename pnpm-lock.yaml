@@ -128,6 +128,27 @@ importers:
         specifier: ~6.0.2
         version: 6.0.3
 
+  tools/custom-element-variants:
+    devDependencies:
+      '@vitest/browser-playwright':
+        specifier: ^4.1.8
+        version: 4.1.8(playwright@1.60.0)(vite@8.0.16(@types/node@24.13.0)(yaml@2.9.0))(vitest@4.1.8)
+      lit:
+        specifier: ^3.3.3
+        version: 3.3.3
+      playwright:
+        specifier: 1.60.0
+        version: 1.60.0
+      typescript:
+        specifier: ~6.0.2
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@types/node@24.13.0)(@vitest/browser-playwright@4.1.8)(vite@8.0.16(@types/node@24.13.0)(yaml@2.9.0))
+      vitest-browser-lit:
+        specifier: ^1.0.1
+        version: 1.0.1(lit@3.3.3)(vitest@4.1.8)
+
 packages:
 
   '@babel/runtime@7.29.7':
