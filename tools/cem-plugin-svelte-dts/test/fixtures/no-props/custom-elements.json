@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/Divider.svelte",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "Divider",
+          "tagName": "my-divider",
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "members": []
+        }
+      ]
+    }
+  ]
+}

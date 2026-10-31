@@ -137,6 +137,27 @@ importers:
         specifier: ~6.0.3
         version: 6.0.3
 
+  tools/cem-plugin-svelte-dts:
+    devDependencies:
+      '@custom-elements-manifest/analyzer':
+        specifier: ^0.11.0
+        version: 0.11.0
+      '@tsconfig/node24':
+        specifier: ^24.0.5
+        version: 24.0.5
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      custom-elements-manifest:
+        specifier: ^2.1.0
+        version: 2.1.0
+      svelte:
+        specifier: ^5.57.3
+        version: 5.57.3
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
+
   tools/custom-element-variants:
     dependencies:
       custom-elements-manifest:

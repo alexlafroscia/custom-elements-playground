@@ -16,6 +16,7 @@ that extend the CEM toolchain:
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | [`cem-plugin-svelte`](./tools/cem-plugin-svelte/README.md)             | Teaches the CEM analyzer to extract metadata from Svelte 5 components |
 | [`cem-plugin-dts`](./tools/cem-plugin-dts/README.md)                   | Generates TypeScript type definitions from a CEM manifest             |
+| [`cem-plugin-svelte-dts`](./tools/cem-plugin-svelte-dts/README.md)     | Generates types for using custom elements in Svelte markup            |
 | [`custom-element-variants`](./tools/custom-element-variants/README.md) | Delegates a custom element to one of several variant implementations  |
 
 ### `definitions/`
