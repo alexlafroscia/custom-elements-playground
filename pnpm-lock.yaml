@@ -129,6 +129,10 @@ importers:
         version: 6.0.3
 
   tools/custom-element-variants:
+    dependencies:
+      custom-elements-manifest:
+        specifier: ^2.1.0
+        version: 2.1.0
     devDependencies:
       '@vitest/browser-playwright':
         specifier: ^4.1.8

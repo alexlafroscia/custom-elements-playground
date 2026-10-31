@@ -1,8 +1,8 @@
 import { html } from "lit";
-import { describe, expect, expectTypeOf, test } from "vitest";
+import { describe, expect, expectTypeOf, test, vi } from "vitest";
 import { render } from "vitest-browser-lit";
 
-import { createVariantElement, type VariantElement } from "../src/index.ts";
+import { createVariantElement, type VariantDescriptor, type VariantElement } from "../src/index.ts";
 
 const STATES = ["idle", "busy"];
 
@@ -68,10 +68,35 @@ class BetaElement extends HTMLElement {
   }
 }
 
+const alpha = {
+  tagName: "test-alpha",
+  attributes: ["label", "state"],
+  members: [
+    { name: "count", kind: "field" },
+    { name: "increment", kind: "method" },
+    { name: "notify", kind: "method" },
+    { name: "reset", kind: "method" },
+    { name: "start", kind: "method" },
+  ],
+  slots: ["icon"],
+  parts: ["label"],
+} as const satisfies VariantDescriptor;
+
+const beta = {
+  tagName: "test-beta",
+  attributes: [],
+  members: [
+    { name: "message", kind: "field" },
+    { name: "shout", kind: "field", readonly: true },
+  ],
+  slots: [],
+  parts: [],
+} as const satisfies VariantDescriptor;
+
 customElements.define("test-alpha", AlphaElement);
 customElements.define("test-beta", BetaElement);
 
-const TestVariant = createVariantElement({ alpha: AlphaElement, beta: BetaElement });
+const TestVariant = createVariantElement({ alpha, beta });
 customElements.define("test-variant", TestVariant);
 
 type TestVariantElement = InstanceType<typeof TestVariant>;
@@ -100,7 +125,7 @@ describe("selecting a variant", () => {
     const host = document.createElement("test-variant-late") as TestVariantElement;
     Object.assign(host, { variant: "alpha", count: 3 });
 
-    customElements.define("test-variant-late", createVariantElement({ alpha: AlphaElement }));
+    customElements.define("test-variant-late", createVariantElement({ alpha }));
     customElements.upgrade(host);
 
     expect(childOf(host)).toBeInstanceOf(AlphaElement);
@@ -122,6 +147,110 @@ describe("selecting a variant", () => {
     expect(() => {
       host.variant = "beta";
     }).toThrow("`variant` cannot be changed once set");
+  });
+
+  test("throws when a variant has a part named `variant`", () => {
+    const Wrapper = createVariantElement({ alpha: { ...alpha, parts: ["variant"] } });
+
+    expect(() => customElements.define("test-variant-part", Wrapper)).toThrow(
+      'Variant "alpha" cannot have a part named "variant"',
+    );
+  });
+});
+
+class DeferredElement extends HTMLElement {
+  static observedAttributes = ["label"];
+
+  value = "";
+
+  describe(): string {
+    return `${this.getAttribute("label")}: ${this.value}`;
+  }
+}
+
+const deferred = {
+  tagName: "test-deferred",
+  attributes: ["label"],
+  members: [
+    { name: "value", kind: "field" },
+    { name: "describe", kind: "method" },
+  ],
+  slots: [],
+  parts: [],
+} as const satisfies VariantDescriptor;
+
+const DeferredVariant = createVariantElement({ deferred });
+customElements.define("test-deferred-variant", DeferredVariant);
+
+describe("a variant defined after the wrapper", () => {
+  test("is created once its element is defined", async () => {
+    const host = document.createElement("test-deferred-variant");
+    host.setAttribute("label", "Label");
+    host.variant = "deferred";
+    host.value = "Value";
+
+    expect(host.shadowRoot!.childElementCount).toBe(0);
+    expect(host.value).toBe("Value");
+    expect(() => host.describe()).toThrow(
+      "Cannot call `describe` before <test-deferred> is defined",
+    );
+
+    customElements.define("test-deferred", DeferredElement);
+    await customElements.whenDefined("test-deferred");
+
+    expect(childOf(host)).toBeInstanceOf(DeferredElement);
+    expect(host.describe()).toBe("Label: Value");
+  });
+
+  test("warns when its element is never defined", () => {
+    vi.useFakeTimers();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      const never = { ...deferred, tagName: "test-never" } as const;
+      customElements.define("test-never-variant", createVariantElement({ never }));
+
+      const host = document.createElement("test-never-variant") as HTMLElement & {
+        variant: string;
+      };
+      host.variant = "never";
+      vi.runAllTimers();
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining("<test-never> has not been defined"),
+      );
+    } finally {
+      warn.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe("descriptors", () => {
+  test("that do not match the element produce a warning", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      const stale = {
+        ...alpha,
+        attributes: ["label", "size"],
+        members: [...alpha.members, { name: "missing", kind: "method" }],
+      } as const;
+      customElements.define("test-stale-variant", createVariantElement({ stale }));
+
+      const host = document.createElement("test-stale-variant") as HTMLElement & {
+        variant: string;
+      };
+      host.variant = "stale";
+
+      expect(warn).toHaveBeenCalledOnce();
+      const [message] = warn.mock.calls[0]!;
+      expect(message).toContain("member `missing` does not exist");
+      expect(message).toContain("attribute `size` is not observed");
+      expect(message).toContain("attribute `state` is observed but not described");
+    } finally {
+      warn.mockRestore();
+    }
   });
 });
 
@@ -163,6 +292,25 @@ describe("properties", () => {
     child.reset();
 
     expect(host.count).toBe(0);
+  });
+
+  test("declared as class fields are forwarded to the child", () => {
+    const host = document.createElement("test-variant");
+    host.variant = "beta";
+
+    if (host.variant === "beta") {
+      host.message = "hello";
+      expect((childOf(host) as BetaElement).message).toBe("hello");
+      expect(host.shout).toBe("HELLO");
+    }
+  });
+
+  test("that are read-only cannot be set on the wrapper", () => {
+    const host = document.createElement("test-variant") as unknown as Record<string, unknown>;
+
+    expect(() => {
+      host.shout = "nope";
+    }).toThrow(TypeError);
   });
 });
 
@@ -276,6 +424,40 @@ describe("slots", () => {
     await expect.element(screen.getByText("Icon")).toBeVisible();
     await expect.element(screen.getByText("Content")).toBeVisible();
   });
+
+  test("content moved into a named slot after the child was created reaches it", async () => {
+    const screen = render(html`
+      <test-variant variant="alpha">
+        <b>Icon</b>
+      </test-variant>
+    `);
+    const icon = screen.container.querySelector("b")!;
+    const iconSlot = childOf(
+      screen.container.querySelector("test-variant")!,
+    ).shadowRoot!.querySelector<HTMLSlotElement>('slot[name="icon"]')!;
+
+    icon.slot = "icon";
+
+    await expect.poll(() => iconSlot.assignedElements({ flatten: true })).toEqual([icon]);
+  });
+});
+
+describe("parts", () => {
+  test("of the child can be styled through the wrapper", () => {
+    const screen = render(html`
+      <style>
+        .styled::part(label) {
+          color: rgb(255, 0, 0);
+        }
+      </style>
+      <test-variant class="styled" variant="alpha" label="Label"></test-variant>
+    `);
+    const label = childOf(
+      screen.container.querySelector("test-variant")!,
+    ).shadowRoot!.querySelector("span")!;
+
+    expect(getComputedStyle(label).color).toBe("rgb(255, 0, 0)");
+  });
 });
 
 class SizedElement extends HTMLElement {
@@ -285,8 +467,16 @@ class SizedElement extends HTMLElement {
   }
 }
 
+const sized = {
+  tagName: "test-sized",
+  attributes: [],
+  members: [],
+  slots: [],
+  parts: [],
+} as const satisfies VariantDescriptor;
+
 customElements.define("test-sized", SizedElement);
-customElements.define("test-sized-variant", createVariantElement({ sized: SizedElement }));
+customElements.define("test-sized-variant", createVariantElement({ sized }));
 
 function rectOf(element: Element) {
   const { left, top, width, height } = element.getBoundingClientRect();
@@ -412,32 +602,45 @@ test("the instance type is discriminated on `variant`", () => {
 });
 
 test("variants cannot declare a `variant` property", () => {
-  class FieldVariant extends HTMLElement {
-    variant = "field";
-  }
+  const field = { ...sized, tagName: "test-field" } as const;
+  const accessor = { ...sized, tagName: "test-accessor" } as const;
+  const optional = { ...sized, tagName: "test-optional" } as const;
 
-  class AccessorVariant extends HTMLElement {
-    get variant(): string {
-      return "accessor";
-    }
-  }
-
-  class OptionalVariant extends HTMLElement {
-    variant?: string;
-  }
-
-  expectTypeOf(createVariantElement).toBeCallableWith({ alpha: AlphaElement, beta: BetaElement });
+  createVariantElement({ alpha, beta });
 
   // @ts-expect-error -- `variant` is owned by the wrapper
-  expectTypeOf(createVariantElement).toBeCallableWith({ field: FieldVariant });
+  createVariantElement({ field });
   // @ts-expect-error -- `variant` is owned by the wrapper
-  expectTypeOf(createVariantElement).toBeCallableWith({ accessor: AccessorVariant });
+  createVariantElement({ accessor });
   // @ts-expect-error -- `variant` is owned by the wrapper
-  expectTypeOf(createVariantElement).toBeCallableWith({ optional: OptionalVariant });
+  createVariantElement({ optional });
 });
+
+class FieldVariant extends HTMLElement {
+  variant = "field";
+}
+
+class AccessorVariant extends HTMLElement {
+  get variant(): string {
+    return "accessor";
+  }
+}
+
+class OptionalVariant extends HTMLElement {
+  variant?: string;
+}
 
 declare global {
   interface HTMLElementTagNameMap {
+    "test-alpha": AlphaElement;
+    "test-beta": BetaElement;
+    "test-deferred": DeferredElement;
+    "test-never": DeferredElement;
+    "test-sized": SizedElement;
+    "test-field": FieldVariant;
+    "test-accessor": AccessorVariant;
+    "test-optional": OptionalVariant;
     "test-variant": TestVariantElement;
+    "test-deferred-variant": InstanceType<typeof DeferredVariant>;
   }
 }

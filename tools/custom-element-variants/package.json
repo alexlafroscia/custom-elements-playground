@@ -6,6 +6,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./manifest": {
+      "import": "./dist/manifest.js",
+      "types": "./dist/manifest.d.ts"
     }
   },
   "files": [
@@ -15,6 +19,9 @@
   "repository": {
     "url": "https://github.com/alexlafroscia/custom-elements-playground",
     "directory": "tools/custom-element-variants"
+  },
+  "dependencies": {
+    "custom-elements-manifest": "^2.1.0"
   },
   "devDependencies": {
     "@vitest/browser-playwright": "^4.1.8",

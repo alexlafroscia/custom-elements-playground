@@ -1,29 +1,21 @@
-/**
- * A custom element class that may be used as a variant. The wrapper owns the `variant` property, so
- * variant elements may not declare one of their own.
- */
-export type VariantConstructor = new (...params: any[]) => HTMLElement & { variant?: never };
+import type {
+  MemberKind,
+  ValidVariants,
+  VariantDescriptor,
+  VariantElementConstructor,
+  Variants,
+} from "./types.js";
 
-export type Variants = Record<string, VariantConstructor>;
-
-/**
- * The instance type of an element created by `createVariantElement`: a union of each variant's
- * instance type, discriminated on the `variant` property.
- */
-export type VariantElement<M extends Variants> = {
-  [K in keyof M & string]: HTMLElement & InstanceType<M[K]> & { variant: K };
-}[keyof M & string];
-
-export interface VariantElementConstructor<M extends Variants> {
-  new (): VariantElement<M>;
-  readonly variants: M;
-  readonly observedAttributes: string[];
-}
-
-type MemberKind = "accessor" | "method";
+export type {
+  VariantDescriptor,
+  VariantElement,
+  VariantElementConstructor,
+  VariantMember,
+  Variants,
+} from "./types.js";
 
 // Members of a variant that should never be forwarded from the wrapper
-const SKIPPED_MEMBERS = new Set<PropertyKey>([
+const SKIPPED_MEMBERS = new Set<string>([
   "constructor",
   "variant",
   "connectedCallback",
@@ -32,6 +24,12 @@ const SKIPPED_MEMBERS = new Set<PropertyKey>([
   "connectedMoveCallback",
   "attributeChangedCallback",
 ]);
+
+// The part that the variant element itself is exposed as
+const VARIANT_PART = "variant";
+
+// How long to wait for a variant element to be defined before warning that it may never be
+const DEFINITION_WARNING_DELAY = 2000;
 
 /**
  * The wrapper generates no box of its own, so that the variant element takes its place in the
@@ -58,27 +56,24 @@ const HOST_STYLES = `
 let hostStyles: CSSStyleSheet | undefined;
 
 /**
- * Collect the public members of each variant class, walking each prototype chain up to (but not
- * including) `HTMLElement.prototype`.
+ * Collect the members of every variant that should be forwarded from the wrapper.
  *
- * If a key is an accessor in any variant it is treated as an accessor, so that reads and writes
- * are forwarded rather than being called.
+ * If a key is a field in any variant it is treated as an accessor, so that reads and writes are
+ * forwarded rather than being called. It is only read-only if it is read-only in every variant
+ * that declares it.
  */
-function collectMembers(variants: Variants): Map<PropertyKey, MemberKind> {
-  const members = new Map<PropertyKey, MemberKind>();
+function collectMembers(variants: Variants): Map<string, MemberKind> {
+  const members = new Map<string, MemberKind>();
 
-  for (const Ctor of Object.values(variants)) {
-    for (
-      let proto = Ctor.prototype;
-      proto && proto !== HTMLElement.prototype;
-      proto = Object.getPrototypeOf(proto)
-    ) {
-      for (const key of Reflect.ownKeys(proto)) {
-        if (SKIPPED_MEMBERS.has(key) || members.get(key) === "accessor") continue;
+  for (const { members: declared } of Object.values(variants)) {
+    for (const { name, kind, readonly } of declared) {
+      if (SKIPPED_MEMBERS.has(name)) continue;
 
-        const desc = Object.getOwnPropertyDescriptor(proto, key)!;
-        members.set(key, typeof desc.value === "function" ? "method" : "accessor");
-      }
+      const previous = members.get(name);
+      const next: MemberKind = kind === "method" ? "method" : readonly ? "readonly" : "accessor";
+
+      if (!previous || previous === "method") members.set(name, next);
+      else if (previous === "readonly" && next === "accessor") members.set(name, next);
     }
   }
 
@@ -96,24 +91,51 @@ function copyAttribute(from: Element, to: Element, name: string): void {
   else to.setAttribute(name, value);
 }
 
-function observedAttributesOf(Ctor: CustomElementConstructor): readonly string[] {
-  return (Ctor as { observedAttributes?: readonly string[] }).observedAttributes ?? [];
+/**
+ * Warn about differences between a descriptor and the element it describes, which usually mean
+ * that the manifest it was generated from is out of date.
+ */
+function checkDescriptor(descriptor: VariantDescriptor, child: HTMLElement): void {
+  const Ctor = child.constructor as { observedAttributes?: readonly string[] };
+  const observed = new Set(Ctor.observedAttributes ?? []);
+  const described = new Set(descriptor.attributes);
+
+  const problems = [
+    ...descriptor.members
+      .filter(({ name }) => !(name in child))
+      .map(({ name }) => `member \`${name}\` does not exist`),
+    ...[...described]
+      .filter((name) => !observed.has(name))
+      .map((name) => `attribute \`${name}\` is not observed`),
+    ...[...observed]
+      .filter((name) => name !== "variant" && !described.has(name))
+      .map((name) => `attribute \`${name}\` is observed but not described`),
+  ];
+
+  if (problems.length > 0) {
+    console.warn(
+      `The descriptor for <${descriptor.tagName}> does not match the element; is the manifest ` +
+        `out of date?\n${problems.map((problem) => `- ${problem}`).join("\n")}`,
+    );
+  }
 }
 
 /**
  * Create a custom element that delegates to one of several variant elements, chosen by the value
  * of its `variant` attribute or property. The variant may be set once, and cannot change after.
  *
- * Variant elements must be registered with `customElements.define` before the returned class is
- * defined, so that their properties can be discovered.
+ * Properties and methods described by each variant are forwarded to the child element. Writes
+ * made before the child is created are buffered and applied once it is.
  *
- * Properties and methods defined on any variant's prototype are forwarded to the child element.
- * Writes made before the variant is known are buffered and applied once the child is created.
+ * Variant elements may be defined before or after the wrapper; the child is created once its
+ * element has been defined.
  */
 export function createVariantElement<const M extends Variants>(
-  variants: M,
+  variants: M & ValidVariants<M>,
 ): VariantElementConstructor<M> {
-  let members: Map<PropertyKey, MemberKind> | undefined;
+  let members: Map<string, MemberKind> | undefined;
+  const checked = new Set<string>();
+  const awaiting = new Set<string>();
 
   class VariantHost extends HTMLElement {
     static readonly variants = variants;
@@ -122,8 +144,8 @@ export function createVariantElement<const M extends Variants>(
       VariantHost.#install();
 
       const attributes = new Set(["variant"]);
-      for (const Ctor of Object.values(variants)) {
-        for (const attribute of observedAttributesOf(Ctor)) attributes.add(attribute);
+      for (const { attributes: declared } of Object.values(variants)) {
+        for (const attribute of declared) attributes.add(attribute);
       }
       return [...attributes];
     }
@@ -134,6 +156,12 @@ export function createVariantElement<const M extends Variants>(
      */
     static #install(): void {
       if (members) return;
+
+      for (const [name, { parts }] of Object.entries(variants)) {
+        if (parts.includes(VARIANT_PART)) {
+          throw new Error(`Variant "${name}" cannot have a part named "${VARIANT_PART}"`);
+        }
+      }
 
       members = collectMembers(variants);
       if (!hostStyles) {
@@ -153,7 +181,12 @@ export function createVariantElement<const M extends Variants>(
               if (child) return (child[key] as (...args: unknown[]) => unknown)(...args);
               if (typeof fallback === "function") return fallback.apply(this, args);
 
-              throw new Error(`Cannot call \`${String(key)}\` before \`variant\` is set`);
+              const variant = this.#variant;
+              throw new Error(
+                variant === undefined
+                  ? `Cannot call \`${key}\` before \`variant\` is set`
+                  : `Cannot call \`${key}\` before <${variants[variant]!.tagName}> is defined`,
+              );
             },
           });
         } else {
@@ -163,11 +196,14 @@ export function createVariantElement<const M extends Variants>(
               const child = this.#child;
               return child ? child[key] : this.#pending.get(key);
             },
-            set(this: VariantHost, value: unknown) {
-              const child = this.#child;
-              if (child) child[key] = value;
-              else this.#pending.set(key, value);
-            },
+            set:
+              kind === "readonly"
+                ? undefined
+                : function (this: VariantHost, value: unknown) {
+                    const child = this.#child;
+                    if (child) child[key] = value;
+                    else this.#pending.set(key, value);
+                  },
           });
         }
       }
@@ -176,7 +212,6 @@ export function createVariantElement<const M extends Variants>(
     #variant: string | undefined;
     #child: (HTMLElement & Record<PropertyKey, unknown>) | undefined;
     #pending = new Map<PropertyKey, unknown>();
-    #slots = new Set<string>();
 
     constructor() {
       super();
@@ -185,9 +220,10 @@ export function createVariantElement<const M extends Variants>(
       root.adoptedStyleSheets = [hostStyles!];
 
       // Properties set before the element was upgraded are own properties that shadow the
-      // forwarders on the prototype; re-apply them so they go through the forwarders instead
-      for (const key of [...members!.keys(), "variant"]) {
-        if (Object.hasOwn(this, key)) {
+      // forwarders on the prototype; re-apply them so they go through the forwarders instead.
+      // Read-only members have no forwarder to write through, so they are left as they are
+      for (const [key, kind] of [...members!, ["variant", "accessor"] as const]) {
+        if (kind !== "readonly" && Object.hasOwn(this, key)) {
           const value = (this as Record<PropertyKey, unknown>)[key];
           delete (this as Record<PropertyKey, unknown>)[key];
           (this as Record<PropertyKey, unknown>)[key] = value;
@@ -210,7 +246,7 @@ export function createVariantElement<const M extends Variants>(
       }
 
       const child = this.#child;
-      if (!child || !observedAttributesOf(variants[this.#variant!]!).includes(name)) return;
+      if (!child || !variants[this.#variant!]!.attributes.includes(name)) return;
 
       copyAttribute(this, child, name);
     }
@@ -228,16 +264,42 @@ export function createVariantElement<const M extends Variants>(
         throw new Error(`Unknown variant "${value}"; expected one of ${expected}`);
       }
 
-      const Ctor = variants[value]!;
-      if (!customElements.getName(Ctor)) {
-        throw new Error(`The element class for variant "${value}" has not been defined`);
+      this.#variant = value;
+
+      const { tagName } = variants[value]!;
+      if (customElements.get(tagName)) {
+        this.#create();
+        return;
       }
 
-      this.#variant = value;
-      const child = new Ctor() as HTMLElement & Record<PropertyKey, unknown>;
-      child.part.add("variant");
+      void customElements.whenDefined(tagName).then(() => this.#create());
 
-      const attributes = observedAttributesOf(Ctor).filter((attribute) => attribute !== "variant");
+      if (!awaiting.has(tagName)) {
+        awaiting.add(tagName);
+        setTimeout(() => {
+          if (customElements.get(tagName)) return;
+          console.warn(
+            `<${tagName}> has not been defined after ${DEFINITION_WARNING_DELAY}ms; ` +
+              `is the module that defines it imported?`,
+          );
+        }, DEFINITION_WARNING_DELAY);
+      }
+    }
+
+    /**
+     * Create the child for the selected variant, once its element has been defined.
+     */
+    #create() {
+      const descriptor = variants[this.#variant!]!;
+      const child = document.createElement(descriptor.tagName) as HTMLElement &
+        Record<PropertyKey, unknown>;
+      child.part.add(VARIANT_PART);
+
+      if (descriptor.parts.length > 0) {
+        child.setAttribute("exportparts", descriptor.parts.join(", "));
+      }
+
+      const attributes = descriptor.attributes.filter((attribute) => attribute !== "variant");
 
       for (const attribute of attributes) {
         if (this.hasAttribute(attribute)) copyAttribute(this, child, attribute);
@@ -248,12 +310,14 @@ export function createVariantElement<const M extends Variants>(
 
       this.#forwardEvents(child);
       this.#reflectAttributes(child, attributes);
+      this.#forwardSlots(child, descriptor.slots);
 
-      child.append(document.createElement("slot"));
+      if (!checked.has(descriptor.tagName)) {
+        checked.add(descriptor.tagName);
+        checkDescriptor(descriptor, child);
+      }
+
       this.#child = child;
-      this.#syncSlots();
-      new MutationObserver(() => this.#syncSlots()).observe(this, { childList: true });
-
       this.shadowRoot!.append(child);
     }
 
@@ -298,21 +362,17 @@ export function createVariantElement<const M extends Variants>(
     }
 
     /**
-     * Create a forwarding `<slot>` within the child for every named slot used by the wrapper's
-     * children, so that slotted content reaches the child's own slots.
+     * Create a forwarding `<slot>` within the child for the default slot and every named slot,
+     * so that slotted content reaches the child's own slots.
      */
-    #syncSlots() {
-      const child = this.#child!;
+    #forwardSlots(child: HTMLElement, names: readonly string[]) {
+      child.append(document.createElement("slot"));
 
-      for (const element of this.children) {
-        const name = element.getAttribute("slot");
-        if (!name || this.#slots.has(name)) continue;
-
+      for (const name of names) {
         const slot = document.createElement("slot");
         slot.name = name;
         slot.slot = name;
         child.append(slot);
-        this.#slots.add(name);
       }
     }
   }
