@@ -7,6 +7,17 @@
     ".": {
       "types": "./register-types/html-element.ts",
       "import": "./dist/index.js"
+    },
+    "./svelte": {
+      "types": "./register-types/svelte-elements.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -17,6 +28,7 @@
     "@vitest/browser-playwright": "^5.0.5",
     "cem-plugin-dts": "workspace:*",
     "cem-plugin-svelte": "workspace:*",
+    "cem-plugin-svelte-dts": "workspace:*",
     "custom-element-vs-code-integration": "^1.5.0",
     "lit": "^3.3.3",
     "playwright": "catalog:",

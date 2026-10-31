@@ -20,7 +20,11 @@ description = "Build the Custom Elements Manifest"
 run = ["pnpm exec cem analyze", "find register-types -type f -exec pnpm oxfmt {} +"]
 sources = ["src/**/*", "custom-elements-manifest.config.js"]
 outputs = ["register-types/**/*", "custom-elements.json"]
-depends = ["//tools/cem-plugin-dts:build", "//tools/cem-plugin-svelte:build"]
+depends = [
+  "//tools/cem-plugin-dts:build",
+  "//tools/cem-plugin-svelte:build",
+  "//tools/cem-plugin-svelte-dts:build",
+]
 
 [tasks.check]
 description = "Run all checks"

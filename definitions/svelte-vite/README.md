@@ -17,6 +17,7 @@ full setup:
 ```js
 import { dts } from "cem-plugin-dts";
 import { createSveltePlugin } from "cem-plugin-svelte";
+import { svelteDts } from "cem-plugin-svelte-dts";
 
 import svelteConfig from "./svelte.config.js";
 
@@ -26,7 +27,14 @@ const { plugin: svelte, overrideModuleCreation } = createSveltePlugin({
 
 export default {
   globs: ["./src/**/*.svelte"],
-  plugins: [svelte, dts({ path: "./register-types/html-element.ts" })],
+  plugins: [
+    svelte,
+    dts({ path: "./register-types/html-element.ts" }),
+    svelteDts({
+      path: "./register-types/svelte-elements.d.ts",
+      imports: ["./html-element.ts"],
+    }),
+  ],
   overrideModuleCreation,
 };
 ```
@@ -81,6 +89,52 @@ For the test suite, which imports individual source files rather than the librar
 ```json
 { "include": ["tests/**/*.ts", "register-types/html-element.ts"] }
 ```
+
+## Svelte type definitions
+
+Svelte markup doesn't consult `HTMLElementTagNameMap`; without further declarations, a custom
+element used in a `.svelte` file accepts any attribute with a value of any type.
+[`cem-plugin-svelte-dts`](../../tools/cem-plugin-svelte-dts/README.md) is another CEM plugin, which
+writes `register-types/svelte-elements.d.ts`. It augments Svelte's `SvelteHTMLElements` so that each
+element accepts its properties, typed by its `HTMLElementTagNameMap` entry, and handlers for the
+events it documents with `@fires`, alongside the attributes and event handlers Svelte accepts on
+every HTML element:
+
+```ts
+import type {} from "svelte/elements";
+
+import type {} from "./html-element.ts";
+
+declare module "svelte/elements" {
+  interface SvelteHTMLElements {
+    "mutable-state": HTMLAttributes<HTMLElementTagNameMap["mutable-state"]> &
+      Partial<Pick<HTMLElementTagNameMap["mutable-state"], "expose">>;
+    "svelte-vite": HTMLAttributes<HTMLElementTagNameMap["svelte-vite"]> &
+      Partial<Pick<HTMLElementTagNameMap["svelte-vite"], "name">> & {
+        /** Dispatched with the name being greeted when the greet button is clicked */
+        ongreet?: (
+          event: CustomEvent<string> & {
+            currentTarget: EventTarget & HTMLElementTagNameMap["svelte-vite"];
+          },
+        ) => any;
+      };
+  }
+}
+```
+
+The `imports` option makes the file import `html-element.ts`, so that the elements' entries in
+`HTMLElementTagNameMap` are available wherever the Svelte types are.
+
+The file is published as the `./svelte` export. Unlike the `HTMLElementTagNameMap` augmentations it
+isn't imported by the entry point, as doing so would require every consumer to have `svelte`
+installed; Svelte apps opt in with a type reference instead:
+
+```ts
+/// <reference types="@cem-playground/svelte-vite/svelte" />
+```
+
+See [`consumers/svelte`](../../consumers/svelte/README.md) for an app that consumes the elements
+this way.
 
 ## Browser testing with mutable properties
 

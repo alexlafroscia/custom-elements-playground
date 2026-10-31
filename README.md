@@ -26,3 +26,12 @@ Example component libraries that demonstrate the full workflow end-to-end:
 | Package                                              | Description                                                                                             |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | [`svelte-vite`](./definitions/svelte-vite/README.md) | Svelte 5 custom elements with CEM manifest generation, type definition output, and Vitest Browser tests |
+
+### `consumers/`
+
+Example apps that consume the custom elements defined in `definitions/`, with their usage validated
+by type checking:
+
+| Package                                  | Description                                                                        |
+| ---------------------------------------- | ---------------------------------------------------------------------------------- |
+| [`svelte`](./consumers/svelte/README.md) | Svelte 5 app using `svelte-vite`'s elements, with markup checked by `svelte-check` |
