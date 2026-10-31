@@ -1,7 +1,7 @@
 monorepo_root = true
 
 [monorepo]
-config_roots = ["definitions/*", "hosts/*", "tools/*"]
+config_roots = ["consumers/*", "definitions/*", "hosts/*", "tools/*"]
 
 [tools]
 node = "24.14.0"

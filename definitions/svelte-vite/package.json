@@ -7,6 +7,17 @@
     ".": {
       "types": "./register-types/html-element.ts",
       "import": "./dist/index.js"
+    },
+    "./svelte": {
+      "types": "./register-types/svelte-elements.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
     }
   },
   "devDependencies": {

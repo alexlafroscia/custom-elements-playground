@@ -26,7 +26,13 @@ const { plugin: svelte, overrideModuleCreation } = createSveltePlugin({
 
 export default {
   globs: ["./src/**/*.svelte"],
-  plugins: [svelte, dts({ path: "./register-types/html-element.ts" })],
+  plugins: [
+    svelte,
+    dts({
+      path: "./register-types/html-element.ts",
+      svelte: { path: "./register-types/svelte-elements.d.ts" },
+    }),
+  ],
   overrideModuleCreation,
 };
 ```
@@ -81,6 +87,39 @@ For the test suite, which imports individual source files rather than the librar
 ```json
 { "include": ["tests/**/*.ts", "register-types/html-element.ts"] }
 ```
+
+## Svelte type definitions
+
+Svelte markup doesn't consult `HTMLElementTagNameMap`; without further declarations, a custom
+element used in a `.svelte` file accepts any attribute with a value of any type. The `svelte` option
+of `cem-plugin-dts` additionally writes `register-types/svelte-elements.d.ts`, which augments
+Svelte's `SvelteHTMLElements` so that each element accepts its properties with their declared types:
+
+```ts
+import type { HTMLAttributes } from "svelte/elements";
+
+import type { HTMLMutableInternalStateElement, HTMLSimpleViteElement } from "./html-element.ts";
+
+declare module "svelte/elements" {
+  interface SvelteHTMLElements {
+    "mutable-state": HTMLAttributes<HTMLMutableInternalStateElement> &
+      Partial<Pick<HTMLMutableInternalStateElement, "expose">>;
+    "svelte-vite": HTMLAttributes<HTMLSimpleViteElement> &
+      Partial<Pick<HTMLSimpleViteElement, "name">>;
+  }
+}
+```
+
+The file is published as the `./svelte` export. Unlike the `HTMLElementTagNameMap` augmentations it
+isn't imported by the entry point, as doing so would require every consumer to have `svelte`
+installed; Svelte apps opt in with a type reference instead:
+
+```ts
+/// <reference types="@cem-playground/svelte-vite/svelte" />
+```
+
+See [`consumers/svelte`](../../consumers/svelte/README.md) for an app that consumes the elements
+this way.
 
 ## Browser testing with mutable properties
 

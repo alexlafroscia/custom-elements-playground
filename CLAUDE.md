@@ -49,6 +49,16 @@ from the relevant package directory (or from the root for workspace-level tasks)
 | `mise run test`         | Run checks and browser tests (headless)          |
 | `mise run test:browser` | Run Vitest browser tests interactively           |
 
+### `consumers/svelte`
+
+| Task                  | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| `mise run dev`        | Start the Vite development server                            |
+| `mise run build`      | Build the app                                                |
+| `mise run check`      | Run all svelte-check / tsc type checks                       |
+| `mise run test`       | Run checks, then verify that invalid usage is reported       |
+| `mise run test:types` | Verify that invalid usage of the custom elements is reported |
+
 ### Cross-package references
 
 `mise` supports cross-package task dependencies using the `//path/to/package:task` syntax. For
