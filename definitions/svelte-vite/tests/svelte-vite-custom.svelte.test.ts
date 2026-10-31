@@ -51,8 +51,6 @@ describe("`getName` method", () => {
 
     value = "Friend";
 
-    expect.poll(() => {
-      expect(element.getName()).toEqual("Friend");
-    });
+    await expect.poll(() => element.getName()).toEqual("Friend");
   });
 });
