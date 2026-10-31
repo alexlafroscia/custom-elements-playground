@@ -411,6 +411,31 @@ test("the instance type is discriminated on `variant`", () => {
   }
 });
 
+test("variants cannot declare a `variant` property", () => {
+  class FieldVariant extends HTMLElement {
+    variant = "field";
+  }
+
+  class AccessorVariant extends HTMLElement {
+    get variant(): string {
+      return "accessor";
+    }
+  }
+
+  class OptionalVariant extends HTMLElement {
+    variant?: string;
+  }
+
+  expectTypeOf(createVariantElement).toBeCallableWith({ alpha: AlphaElement, beta: BetaElement });
+
+  // @ts-expect-error -- `variant` is owned by the wrapper
+  expectTypeOf(createVariantElement).toBeCallableWith({ field: FieldVariant });
+  // @ts-expect-error -- `variant` is owned by the wrapper
+  expectTypeOf(createVariantElement).toBeCallableWith({ accessor: AccessorVariant });
+  // @ts-expect-error -- `variant` is owned by the wrapper
+  expectTypeOf(createVariantElement).toBeCallableWith({ optional: OptionalVariant });
+});
+
 declare global {
   interface HTMLElementTagNameMap {
     "test-variant": TestVariantElement;

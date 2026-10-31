@@ -1,11 +1,17 @@
-export type Variants = Record<string, CustomElementConstructor>;
+/**
+ * A custom element class that may be used as a variant. The wrapper owns the `variant` property, so
+ * variant elements may not declare one of their own.
+ */
+export type VariantConstructor = new (...params: any[]) => HTMLElement & { variant?: never };
+
+export type Variants = Record<string, VariantConstructor>;
 
 /**
  * The instance type of an element created by `createVariantElement`: a union of each variant's
  * instance type, discriminated on the `variant` property.
  */
 export type VariantElement<M extends Variants> = {
-  [K in keyof M & string]: HTMLElement & Omit<InstanceType<M[K]>, "variant"> & { variant: K };
+  [K in keyof M & string]: HTMLElement & InstanceType<M[K]> & { variant: K };
 }[keyof M & string];
 
 export interface VariantElementConstructor<M extends Variants> {

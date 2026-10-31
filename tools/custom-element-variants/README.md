@@ -40,8 +40,8 @@ the `variant` property:
 
 ```ts
 type MyButtonElement = InstanceType<typeof MyButton>;
-// = (HTMLElement & Omit<ActionButton, "variant"> & { variant: "action" })
-//   | (HTMLElement & Omit<LinkButton, "variant"> & { variant: "link" })
+// = (HTMLElement & ActionButton & { variant: "action" })
+//   | (HTMLElement & LinkButton & { variant: "link" })
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -54,6 +54,17 @@ const button = document.querySelector("my-button")!;
 if (button.variant === "link") {
   button.href; // `string`, only available on the `link` variant
 }
+```
+
+Because the wrapper owns the `variant` property, variant elements may not declare one of their own;
+passing a class that does to `createVariantElement` is a type error:
+
+```ts
+class OtherButton extends HTMLElement {
+  variant = "primary";
+}
+
+createVariantElement({ other: OtherButton }); // Error: Type 'typeof OtherButton' is not assignable to type 'VariantConstructor'
 ```
 
 The same type is available from a map of variants through `VariantElement`:
