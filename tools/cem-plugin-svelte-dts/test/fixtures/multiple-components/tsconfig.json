@@ -1,0 +1,4 @@
+{
+  "extends": "../../tsconfig.fixture.json",
+  "files": ["svelte-elements.d.ts", "html-element.d.ts"]
+}

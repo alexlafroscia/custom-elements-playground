@@ -50,7 +50,9 @@ svelteDts({
 Given a manifest documenting a `simple-greeter` element with a `name` property, the plugin writes:
 
 ```ts
-import type { HTMLAttributes } from "svelte/elements";
+// Loads the module augmented below, which also makes this file a module, as
+// augmenting requires
+import type {} from "svelte/elements";
 
 declare module "svelte/elements" {
   interface SvelteHTMLElements {
@@ -88,3 +90,8 @@ svelteDts({
 ```
 
 Specifiers are emitted as-is, so relative paths are resolved from the generated file.
+
+If the registration is missing from a consumer's program, the generated file has type errors. With
+`skipLibCheck` enabled, as [`@tsconfig/svelte`](https://www.npmjs.com/package/@tsconfig/svelte)
+does, those errors aren't reported, and the element's props are silently typed as `any`. Prefer the
+`imports` option whenever the registration lives in a file of its own.
