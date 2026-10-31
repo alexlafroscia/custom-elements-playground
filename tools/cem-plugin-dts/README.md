@@ -28,12 +28,6 @@ dts({
 
   // Directory to resolve `path` relative to. Defaults to process.cwd().
   cwd: string,
-
-  // Additionally emit types for using the elements in Svelte markup. Optional.
-  svelte: {
-    // Path to write the generated .d.ts file to, resolved relative to `cwd`.
-    path: string,
-  },
 });
 ```
 
@@ -69,31 +63,6 @@ import "./components.d.ts;
 
 Multiple elements in the same manifest are all merged into a single `HTMLElementTagNameMap`
 declaration in one file.
-
-## Svelte Output
-
-When the `svelte` option is provided, the plugin also writes a module augmentation of
-`svelte/elements` so that `svelte-check` validates usage of each element in Svelte markup:
-
-```ts
-import type { HTMLAttributes } from "svelte/elements";
-
-import type { HTMLSimpleGreeterElement } from "./types.ts";
-
-declare module "svelte/elements" {
-  interface SvelteHTMLElements {
-    "simple-greeter": HTMLAttributes<HTMLSimpleGreeterElement> &
-      Partial<Pick<HTMLSimpleGreeterElement, "name">>;
-  }
-}
-```
-
-Svelte sets a prop on a custom element as a property when the element has one by that name, so each
-element accepts its public, writable fields, typed by its generated `HTMLElement` interface. Fields
-are optional, since a custom element can't require that a property be set.
-
-Emit this file with a `.d.ts` extension so that consumers can opt into it with
-`/// <reference types="..." />`, without needing `svelte` installed unless they use it.
 
 ## Project Setup Considerations
 

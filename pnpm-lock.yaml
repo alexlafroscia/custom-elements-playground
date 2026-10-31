@@ -81,6 +81,9 @@ importers:
       cem-plugin-svelte:
         specifier: workspace:*
         version: link:../../tools/cem-plugin-svelte
+      custom-element-svelte-integration:
+        specifier: ^1.2.0
+        version: 1.2.0(prettier@3.8.4)
       custom-element-vs-code-integration:
         specifier: ^1.5.0
         version: 1.5.0(prettier@3.8.4)
@@ -884,6 +887,9 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  custom-element-svelte-integration@1.2.0:
+    resolution: {integrity: sha512-idA8o5oj8uDYPnq7zpkr03l5WHXC8X4adKJ399TtwdXmeYWKDP0VzPAVgJGj+LQaLoa2OCyHE+GMOaUS++dN1Q==}
 
   custom-element-vs-code-integration@1.5.0:
     resolution: {integrity: sha512-dMKlHq7qz1HbNZUXqw/4fVTh8FBLYX/dIQRt9M0M3KX+Z4iXKUzXxCBdNIdLjE18kMiOCZuRLDZly5mBznoCYw==}
@@ -2071,6 +2077,12 @@ snapshots:
   comment-parser@1.4.9: {}
 
   convert-source-map@2.0.0: {}
+
+  custom-element-svelte-integration@1.2.0(prettier@3.8.4):
+    dependencies:
+      '@prettier/sync': 0.5.5(prettier@3.8.4)
+    transitivePeerDependencies:
+      - prettier
 
   custom-element-vs-code-integration@1.5.0(prettier@3.8.4):
     dependencies:

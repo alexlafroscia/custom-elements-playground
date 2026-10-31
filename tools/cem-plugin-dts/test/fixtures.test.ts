@@ -45,18 +45,12 @@ for (const fixture of fixtures) {
         context: {},
       });
 
-      // Every emitted file is compared against the file at the same location
-      // within the fixture
-      const outputPaths = [outputPath, ...(options.svelte ? [options.svelte.path] : [])];
+      const generated = await fs.readFile(path.resolve(outputRoot, outputPath), {
+        encoding: "utf-8",
+      });
+      const expected = await fs.readFile(path.resolve(root, outputPath), { encoding: "utf-8" });
 
-      for (const outputPath of outputPaths) {
-        const generated = await fs.readFile(path.resolve(outputRoot, outputPath), {
-          encoding: "utf-8",
-        });
-        const expected = await fs.readFile(path.resolve(root, outputPath), { encoding: "utf-8" });
-
-        assert.strictEqual(normalizeTypeScript(generated), normalizeTypeScript(expected));
-      }
+      assert.strictEqual(normalizeTypeScript(generated), normalizeTypeScript(expected));
     } finally {
       await fs.rm(outputRoot, { recursive: true, force: true });
     }

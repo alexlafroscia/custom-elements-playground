@@ -1,5 +1,6 @@
 import { dts } from "cem-plugin-dts";
 import { createSveltePlugin } from "cem-plugin-svelte";
+import { customElementSveltePlugin } from "custom-element-svelte-integration";
 import { customElementVsCodePlugin } from "custom-element-vs-code-integration";
 
 import svelteConfig from "./svelte.config.js";
@@ -14,11 +15,12 @@ export default {
   plugins: [
     svelte,
     customElementVsCodePlugin(),
+    customElementSveltePlugin({
+      outdir: "./register-types",
+      fileName: "svelte-elements.d.ts",
+    }),
     dts({
       path: "./register-types/html-element.ts",
-      svelte: {
-        path: "./register-types/svelte-elements.d.ts",
-      },
     }),
   ],
   overrideModuleCreation,
