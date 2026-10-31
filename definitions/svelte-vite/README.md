@@ -100,7 +100,9 @@ element accepts its properties, typed by its `HTMLElementTagNameMap` entry, alon
 and event handlers Svelte accepts on every HTML element:
 
 ```ts
-import type { HTMLAttributes } from "svelte/elements";
+// Loads the module augmented below, which also makes this file a module, as
+// augmenting requires
+import type {} from "svelte/elements";
 
 import type {} from "./html-element.ts";
 
