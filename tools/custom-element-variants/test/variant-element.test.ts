@@ -4,8 +4,10 @@ import { render } from "vitest-browser-lit";
 
 import { createVariantElement, type VariantElement } from "../src/index.ts";
 
+const STATES = ["idle", "busy"];
+
 class AlphaElement extends HTMLElement {
-  static observedAttributes = ["label"];
+  static observedAttributes = ["label", "state"];
 
   #count = 0;
 
@@ -25,14 +27,31 @@ class AlphaElement extends HTMLElement {
     this.dispatchEvent(new CustomEvent("alpha-notify", { detail: this.#count }));
   }
 
+  /** Updates the element's own property, as it might in response to user interaction */
+  reset(): void {
+    this.count = 0;
+  }
+
+  /** Updates the element's own attribute, as it might to expose its state for styling */
+  start(): void {
+    this.setAttribute("state", "busy");
+  }
+
   connectedCallback() {
     const root = this.shadowRoot ?? this.attachShadow({ mode: "open" });
     root.innerHTML = `<span part="label"></span><slot name="icon"></slot><slot></slot>`;
     this.#renderLabel();
+
+    if (!this.hasAttribute("state")) this.setAttribute("state", "idle");
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback(name: string, _oldValue: string | null, value: string | null) {
     this.#renderLabel();
+
+    // Normalize unknown states, so that the element writes to an attribute it was just given
+    if (name === "state" && value !== null && !STATES.includes(value)) {
+      this.setAttribute("state", "idle");
+    }
   }
 
   #renderLabel() {
@@ -106,8 +125,16 @@ describe("selecting a variant", () => {
   });
 });
 
-describe("forwarding", () => {
-  test("properties set before the variant are applied to the child", () => {
+function renderAlpha() {
+  const screen = render(html`<test-variant variant="alpha"></test-variant>`);
+  const host = screen.container.querySelector("test-variant")!;
+  if (host.variant !== "alpha") throw new Error("Expected the `alpha` variant");
+
+  return { host, child: childOf(host) as AlphaElement };
+}
+
+describe("properties", () => {
+  test("set before the variant are applied to the child", () => {
     const host = document.createElement("test-variant") as TestVariantElement & AlphaElement;
     host.count = 5;
     expect(host.count).toBe(5);
@@ -117,7 +144,7 @@ describe("forwarding", () => {
     expect((childOf(host) as AlphaElement).count).toBe(5);
   });
 
-  test("properties and methods are forwarded to the child", () => {
+  test("and methods are forwarded to the child", () => {
     const host = document.createElement("test-variant");
     host.variant = "alpha";
 
@@ -129,7 +156,18 @@ describe("forwarding", () => {
     }
   });
 
-  test("observed attributes are forwarded to the child", async () => {
+  test("the child sets on itself are visible on the wrapper", () => {
+    const { host, child } = renderAlpha();
+    host.count = 5;
+
+    child.reset();
+
+    expect(host.count).toBe(0);
+  });
+});
+
+describe("attributes", () => {
+  test("that are observed are forwarded to the child", async () => {
     const screen = render(html`<test-variant variant="alpha" label="Hello"></test-variant>`);
     const host = screen.container.querySelector("test-variant")!;
 
@@ -142,14 +180,72 @@ describe("forwarding", () => {
     expect(childOf(host).hasAttribute("label")).toBe(false);
   });
 
-  test("unobserved attributes are not forwarded to the child", async () => {
+  test("that are unobserved are not forwarded to the child", async () => {
     const screen = render(html`<test-variant variant="alpha" class="foo"></test-variant>`);
     const host = screen.container.querySelector("test-variant")!;
 
     expect(childOf(host).hasAttribute("class")).toBe(false);
   });
 
-  test("events that are not composed are re-dispatched from the wrapper", () => {
+  test("the child sets on itself are reflected to the wrapper", async () => {
+    const { host, child } = renderAlpha();
+
+    child.start();
+
+    await expect.poll(() => host.getAttribute("state")).toBe("busy");
+  });
+
+  test("the child removes from itself are removed from the wrapper", async () => {
+    const { host, child } = renderAlpha();
+    await expect.poll(() => host.getAttribute("state")).toBe("idle");
+
+    child.removeAttribute("state");
+
+    await expect.poll(() => host.hasAttribute("state")).toBe(false);
+  });
+
+  test("the child sets while connecting are reflected to the wrapper", async () => {
+    const { host } = renderAlpha();
+
+    await expect.poll(() => host.getAttribute("state")).toBe("idle");
+  });
+
+  test("set on the wrapper are not overwritten by the child's default", async () => {
+    const screen = render(html`<test-variant variant="alpha" state="busy"></test-variant>`);
+    const host = screen.container.querySelector("test-variant")!;
+
+    await Promise.resolve();
+
+    expect(host.getAttribute("state")).toBe("busy");
+    expect(childOf(host).getAttribute("state")).toBe("busy");
+  });
+
+  test("the child normalizes are reflected back to the wrapper", async () => {
+    const { host, child } = renderAlpha();
+
+    host.setAttribute("state", "unknown");
+
+    await expect.poll(() => host.getAttribute("state")).toBe("idle");
+    expect(child.getAttribute("state")).toBe("idle");
+  });
+
+  test("reflected from the child can be observed on the wrapper", async () => {
+    const { host, child } = renderAlpha();
+    await expect.poll(() => host.getAttribute("state")).toBe("idle");
+
+    const changes: (string | null)[] = [];
+    new MutationObserver((records) => {
+      for (const record of records) changes.push(host.getAttribute(record.attributeName!));
+    }).observe(host, { attributeFilter: ["state"] });
+
+    child.start();
+
+    await expect.poll(() => changes).toEqual(["busy"]);
+  });
+});
+
+describe("events", () => {
+  test("that are not composed are re-dispatched from the wrapper", () => {
     const host = document.createElement("test-variant");
     host.variant = "alpha";
 
@@ -165,7 +261,9 @@ describe("forwarding", () => {
 
     expect(details).toEqual([1]);
   });
+});
 
+describe("slots", () => {
   test("slotted content reaches the child's slots", async () => {
     const screen = render(html`
       <test-variant variant="alpha" label="Label">

@@ -57,6 +57,17 @@ function collectMembers(variants: Variants): Map<PropertyKey, MemberKind> {
   return members;
 }
 
+/**
+ * Copy the current value of an attribute from one element to another, if it differs.
+ */
+function copyAttribute(from: Element, to: Element, name: string): void {
+  const value = from.getAttribute(name);
+  if (to.getAttribute(name) === value) return;
+
+  if (value === null) to.removeAttribute(name);
+  else to.setAttribute(name, value);
+}
+
 function observedAttributesOf(Ctor: CustomElementConstructor): readonly string[] {
   return (Ctor as { observedAttributes?: readonly string[] }).observedAttributes ?? [];
 }
@@ -173,8 +184,7 @@ export function createVariantElement<const M extends Variants>(
       const child = this.#child;
       if (!child || !observedAttributesOf(variants[this.#variant!]!).includes(name)) return;
 
-      if (value === null) child.removeAttribute(name);
-      else child.setAttribute(name, value);
+      copyAttribute(this, child, name);
     }
 
     #select(value: string | null) {
@@ -198,17 +208,17 @@ export function createVariantElement<const M extends Variants>(
       this.#variant = value;
       const child = new Ctor() as HTMLElement & Record<PropertyKey, unknown>;
 
-      for (const attribute of observedAttributesOf(Ctor)) {
-        const attributeValue = this.getAttribute(attribute);
-        if (attribute !== "variant" && attributeValue !== null) {
-          child.setAttribute(attribute, attributeValue);
-        }
+      const attributes = observedAttributesOf(Ctor).filter((attribute) => attribute !== "variant");
+
+      for (const attribute of attributes) {
+        if (this.hasAttribute(attribute)) copyAttribute(this, child, attribute);
       }
 
       for (const [key, pendingValue] of this.#pending) child[key] = pendingValue;
       this.#pending.clear();
 
       this.#forwardEvents(child);
+      this.#reflectAttributes(child, attributes);
 
       child.append(document.createElement("slot"));
       this.#child = child;
@@ -237,6 +247,25 @@ export function createVariantElement<const M extends Variants>(
         if (forwarded.defaultPrevented) event.preventDefault();
         return result && hostResult;
       };
+    }
+
+    /**
+     * Reflect changes the child makes to its own observed attributes back onto the wrapper, so
+     * that they remain observable from outside of it.
+     *
+     * Values are only written when they differ, which stops changes from bouncing between the
+     * wrapper and the child.
+     */
+    #reflectAttributes(child: HTMLElement, attributes: readonly string[]) {
+      if (attributes.length === 0) return;
+
+      // Pick up any attributes the child set on itself while it was being constructed
+      for (const attribute of attributes) copyAttribute(child, this, attribute);
+
+      new MutationObserver((records) => {
+        const changed = new Set(records.map((record) => record.attributeName!));
+        for (const attribute of changed) copyAttribute(child, this, attribute);
+      }).observe(child, { attributeFilter: [...attributes] });
     }
 
     /**
