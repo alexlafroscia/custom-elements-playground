@@ -81,9 +81,9 @@ importers:
       cem-plugin-svelte:
         specifier: workspace:*
         version: link:../../tools/cem-plugin-svelte
-      custom-element-svelte-integration:
-        specifier: ^1.2.0
-        version: 1.2.0(prettier@3.8.4)
+      cem-plugin-svelte-dts:
+        specifier: workspace:*
+        version: link:../../tools/cem-plugin-svelte-dts
       custom-element-vs-code-integration:
         specifier: ^1.5.0
         version: 1.5.0(prettier@3.8.4)
@@ -155,6 +155,27 @@ importers:
       '@types/estree':
         specifier: ^1.0.10
         version: 1.0.10
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      custom-elements-manifest:
+        specifier: ^2.1.0
+        version: 2.1.0
+      svelte:
+        specifier: ^5.57.3
+        version: 5.57.3
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
+
+  tools/cem-plugin-svelte-dts:
+    devDependencies:
+      '@custom-elements-manifest/analyzer':
+        specifier: ^0.11.0
+        version: 0.11.0
+      '@tsconfig/node24':
+        specifier: ^24.0.5
+        version: 24.0.5
       '@types/node':
         specifier: ^24.19.2
         version: 24.19.2
@@ -887,9 +908,6 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
-
-  custom-element-svelte-integration@1.2.0:
-    resolution: {integrity: sha512-idA8o5oj8uDYPnq7zpkr03l5WHXC8X4adKJ399TtwdXmeYWKDP0VzPAVgJGj+LQaLoa2OCyHE+GMOaUS++dN1Q==}
 
   custom-element-vs-code-integration@1.5.0:
     resolution: {integrity: sha512-dMKlHq7qz1HbNZUXqw/4fVTh8FBLYX/dIQRt9M0M3KX+Z4iXKUzXxCBdNIdLjE18kMiOCZuRLDZly5mBznoCYw==}
@@ -2077,12 +2095,6 @@ snapshots:
   comment-parser@1.4.9: {}
 
   convert-source-map@2.0.0: {}
-
-  custom-element-svelte-integration@1.2.0(prettier@3.8.4):
-    dependencies:
-      '@prettier/sync': 0.5.5(prettier@3.8.4)
-    transitivePeerDependencies:
-      - prettier
 
   custom-element-vs-code-integration@1.5.0(prettier@3.8.4):
     dependencies:

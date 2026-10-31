@@ -9,7 +9,7 @@
       "import": "./dist/index.js"
     },
     "./svelte": {
-      "types": "./types/svelte.d.ts"
+      "types": "./register-types/svelte-elements.d.ts"
     }
   },
   "peerDependencies": {
@@ -28,7 +28,7 @@
     "@vitest/browser-playwright": "^5.0.5",
     "cem-plugin-dts": "workspace:*",
     "cem-plugin-svelte": "workspace:*",
-    "custom-element-svelte-integration": "^1.2.0",
+    "cem-plugin-svelte-dts": "workspace:*",
     "custom-element-vs-code-integration": "^1.5.0",
     "lit": "^3.3.3",
     "playwright": "catalog:",

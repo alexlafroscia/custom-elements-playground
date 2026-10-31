@@ -21,6 +21,14 @@ from the relevant package directory (or from the root for workspace-level tasks)
 | `mise run test`            | Build, typecheck tests, then run unit tests |
 | `mise run typecheck:tests` | Type-check test files only                  |
 
+### `tools/cem-plugin-svelte-dts`
+
+| Task                       | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| `mise run build`           | Compile TypeScript to `dist/`               |
+| `mise run test`            | Build, typecheck tests, then run unit tests |
+| `mise run typecheck:tests` | Type-check test files only                  |
+
 ### `tools/cem-plugin-svelte`
 
 | Task                       | Description                                 |
